@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 class BasicBlock(nn.Module): # torch.nn.Module을 상속.
-                             # 상속; 어떤 클래스를 만들 때 다른 클래스의 기능을 그대로 가지고오는 것.
+    expansion= 1                        # 상속; 어떤 클래스를 만들 때 다른 클래스의 기능을 그대로 가지고오는 것.
     def __init__(self, in_channels, out_channels, stride=1):
         '''
         super().__init__()
@@ -21,14 +21,14 @@ class BasicBlock(nn.Module): # torch.nn.Module을 상속.
         self.bn1 = nn.BatchNorm2d(out_channels)
         self.relu1 = nn.ReLU()
 
-        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(out_channels)
         self.relu2 = nn.ReLU()
         
-        if (stride != 1) or (in_channels != out_channels):
+        if (stride != 1) or (in_channels != out_channels * self.expansion):
             self.shortcut = nn.Sequential(
-                nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=1, bias=False),
-                nn.BatchNorm2d(out_channels)
+                nn.Conv2d(in_channels, out_channels * self.expansion, kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(out_channels * self.expansion)
             )
         else:
             self.shortcut = nn.Sequential() # identity mapping
@@ -83,8 +83,8 @@ class BottleNeck(nn.Module):
         
         if (stride != 1) or (in_channels != out_channels * self.expansion):
             self.shortcut = nn.Sequential(
-                nn.Conv2d(in_channels, out_channels * self.expansion, kernel_size=1, stride=1, bias=False),
-                nn.BatchNorm2d(out_channels)
+                nn.Conv2d(in_channels, out_channels * self.expansion, kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(out_channels * self.expansion)
             )
         else:
             self.shortcut = nn.Sequential() # identity mapping
@@ -94,7 +94,7 @@ class BottleNeck(nn.Module):
         out = self.bn1(out)
         out = self.relu1(out)
         
-        out = self.conv2(x)
+        out = self.conv2(out)
         out = self.bn2(out)
         out = self.relu2(out)
 
@@ -124,18 +124,66 @@ class BottleNeck(nn.Module):
 ####################################################################################################
 
 class ResNet(nn.Module):
-    def __init__(self):
-        pass
+    ######################################
+    # 가중치 초기화 아직 구현 못함!!!!!
+    ######################################
+    def __init__(self, block, num_blocks, num_classes=10):
+        super(ResNet,self).__init__()
+        self.in_channels = 64
 
-    def _make_layer(self):
-        pass
+        self.conv1 = nn.Sequential(
+            nn.Conv2d(in_channels=3, out_channels=64, kernel_size=7, stride=2, padding=3, bias=False),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1) # padding은 어ㅓㄸㅎ게 정하는거지...
+        )
+        self.conv2 = self.make_layer(block, num_blocks[0], out_channels=64, stride=1) #시작은 stride 2로 시작, 이후 stride 1. stride 1 부분은 make leyer 함수 안에서 블록 만들 때 구현될것..
+        self.conv3 = self.make_layer(block, num_blocks[1], out_channels=128, stride=2) 
+        self.conv4 = self.make_layer(block, num_blocks[2], out_channels=256, stride=2)
+        self.conv5 = self.make_layer(block, num_blocks[3], out_channels=512, stride=2)
 
-    def _init_layer(self):
-        pass
+        self.pool = nn.AdaptiveAvgPool2d(output_size=(1,1))
+
+        self.fc1 = nn.Linear(512 * block.expansion, 1000)
+        self.fc2 = nn.Linear(1000, num_classes)
+
+    def make_layer(self, block, num_blocks, out_channels, stride):
+        strides = [stride] + [1] * (num_blocks - 1)
+        layers = []
+        for stride in strides:
+            layers.append(block(self.in_channels, out_channels, stride))
+            self.in_channels = out_channels * block.expansion
+
+        return nn.Sequential(*layers) # 언패킹 연산자
 
     def forward(self, x):
-        pass
+        out = self.conv1(x)
+        out = self.conv2(out)
+        out = self.conv3(out)
+        out = self.conv4(out)
+        out = self.conv5(out)
+
+        out = self.pool(out)
+        out = out.view(out.size(0), -1)
+        out = self.fc1(out)
+        out = self.fc2(out)
+
+        return out
 
 
 class Model:
-    pass
+    def resnet18(self):
+        return ResNet(BasicBlock, [2, 2, 2, 2])
+
+    def resnet34(self):
+        return ResNet(BasicBlock, [3, 4, 6, 3])
+
+    def resnet50(self):
+        return ResNet(BottleNeck, [3, 4, 6, 3])
+
+    def resnet101(self):
+        return ResNet(BottleNeck, [3, 4, 23, 3])
+
+    def resnet152(self):
+        return ResNet(BottleNeck, [3, 8, 36, 3])
+
