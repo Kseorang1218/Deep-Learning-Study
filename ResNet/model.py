@@ -137,17 +137,17 @@ class ResNet(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1) # padding은 어ㅓㄸㅎ게 정하는거지...
         )
-        self.conv2 = self.make_layer(block, num_blocks[0], out_channels=64, stride=1) #시작은 stride 2로 시작, 이후 stride 1. stride 1 부분은 make leyer 함수 안에서 블록 만들 때 구현될것..
-        self.conv3 = self.make_layer(block, num_blocks[1], out_channels=128, stride=2) 
-        self.conv4 = self.make_layer(block, num_blocks[2], out_channels=256, stride=2)
-        self.conv5 = self.make_layer(block, num_blocks[3], out_channels=512, stride=2)
+        self.conv2 = self._make_layer(block, num_blocks[0], out_channels=64, stride=1) #시작은 stride 2로 시작, 이후 stride 1. stride 1 부분은 make leyer 함수 안에서 블록 만들 때 구현될것..
+        self.conv3 = self._make_layer(block, num_blocks[1], out_channels=128, stride=2) 
+        self.conv4 = self._make_layer(block, num_blocks[2], out_channels=256, stride=2)
+        self.conv5 = self._make_layer(block, num_blocks[3], out_channels=512, stride=2)
 
         self.pool = nn.AdaptiveAvgPool2d(output_size=(1,1))
 
         self.fc1 = nn.Linear(512 * block.expansion, 1000)
         self.fc2 = nn.Linear(1000, num_classes)
 
-    def make_layer(self, block, num_blocks, out_channels, stride):
+    def _make_layer(self, block, num_blocks, out_channels, stride):
         strides = [stride] + [1] * (num_blocks - 1)
         layers = []
         for stride in strides:
@@ -186,4 +186,3 @@ class Model:
 
     def resnet152(self):
         return ResNet(BottleNeck, [3, 8, 36, 3])
-
