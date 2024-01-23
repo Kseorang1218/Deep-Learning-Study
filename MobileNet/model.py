@@ -19,18 +19,21 @@ class InvertedResidual(nn.Module):
         layers = []
         if expand_ratio != 1:
             # pw
-            layers.append(nn.Sequential(nn.Conv2d(in_channels=in_channels, out_channels=hidden_dim, kernel_size=1, stride=1, bias=False),
+            layers.append(nn.Sequential(nn.Conv2d(in_channels=in_channels, out_channels=hidden_dim, kernel_size=1, stride=1, 
+                                                  padding=0, bias=False),
                                         nn.BatchNorm2d(hidden_dim),
                                         nn.ReLU6()))
         layers.append(
             nn.Sequential(
                 # dw
-                nn.Conv2d(in_channels=hidden_dim, out_channels=hidden_dim, kernel_size=3, stride=stride, groups=hidden_dim, bias=False),
+                nn.Conv2d(in_channels=hidden_dim, out_channels=hidden_dim, kernel_size=3, stride=stride, 
+                          padding=1 ,groups=hidden_dim, bias=False),
                 nn.BatchNorm2d(hidden_dim),
                 nn.ReLU6(),
 
                 #pw
-                nn.Conv2d(in_channels=hidden_dim, out_channels=out_channels, kernel_size=1, stride=1, padding=0, bias=False),
+                nn.Conv2d(in_channels=hidden_dim, out_channels=out_channels, kernel_size=1,stride=1, 
+                          padding=0, bias=False),
                 nn.BatchNorm2d(out_channels)
                 )
         )
@@ -41,9 +44,6 @@ class InvertedResidual(nn.Module):
 
     def forward(self, x):
         if self.use_res_connect:
-            print(x.size())
-            print(self.conv(x).size())
-            print(self.conv)
             return self.conv(x) + x
         else:
             return self.conv(x)
@@ -77,7 +77,8 @@ class MobileNetV2(nn.Module):
 
         layers = []
         layers.append(nn.Sequential(
-            nn.Conv2d(in_channels=3, out_channels=input_channel, kernel_size=3, stride=2, bias=False),
+            nn.Conv2d(in_channels=3, out_channels=input_channel, kernel_size=3, stride=2, 
+                      padding=1, bias=False),
             nn.BatchNorm2d(input_channel),
             nn.ReLU6()
         ))
@@ -93,15 +94,16 @@ class MobileNetV2(nn.Module):
                 input_channel = output_channel
 
         layers.append(nn.Sequential(
-            nn.Conv2d(in_channels=input_channel, out_channels=last_channel, kernel_size=1, stride=1, bias=False),
+            nn.Conv2d(in_channels=input_channel, out_channels=last_channel, kernel_size=1, stride=1, 
+                      padding=0, bias=False),
             nn.BatchNorm2d(last_channel),
             nn.ReLU6(last_channel)
         ))
 
         self.layers = nn.Sequential(*layers)
 
-        # self.pool = nn.AdaptiveAvgPool2d((1,1))
-        self.pool = nn.AvgPool2d(7,7)
+        self.pool = nn.AdaptiveAvgPool2d((1,1))
+        # self.pool = nn.AvgPool2d(7,7)
         self.dropout = nn.Dropout(p=dropout)
         self.fc = nn.Linear(last_channel, num_classes)
 

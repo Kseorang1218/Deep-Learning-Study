@@ -193,8 +193,8 @@ def test(model, test_loader, device, criterion, batch_size):
 파라미터 정의 
 '''
 BATCH_SIZE = 32
-EPOCHS = 2
-LEARNING_RATE = 0.1
+EPOCHS = 100
+LEARNING_RATE = 0.0001
 PATH = './saved/'
 
 
