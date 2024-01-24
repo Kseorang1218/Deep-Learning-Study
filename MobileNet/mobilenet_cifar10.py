@@ -135,7 +135,7 @@ def visualize_model(model, num_images=9):
                     axs[row, col].imshow(inputs.cpu().data[j].numpy().transpose((1, 2, 0)))
                     axs[row, col].axis('off')
                     axs[row, col].set_title('predicted: {}'.format(train_dataset.classes[preds[j]]))
-                    plt.savefig('./result.png')
+                    plt.savefig('./saved/result.png')
                 images_so_far += 1
 
                 if images_so_far == num_images:
@@ -247,9 +247,6 @@ test_loader_for_visualize = torch.utils.data.DataLoader(dataset = test_dataset_f
 
 # 모델, optimizer, loss function, scheduler 정의
 model = MobileNetV2().to(DEVICE)
-# from torchvision import models
-# models.mobilenet_v2
-# model = models.mobilenet_v2().to(DEVICE)
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=0.0001)
 criterion = nn.CrossEntropyLoss()
 
@@ -281,6 +278,7 @@ for epoch in range(1, EPOCHS + 1):
 # 그래프 그리고 저장
 DrawGraph(test_acc_list, test_loss_list, 'test', mode='test', path=PATH+'test.png')
 DrawGraph(train_acc_list, train_loss_list, 'train', mode='train', path=PATH+'train.png')
+
 # 최대 test 정확도 출력
 max_test_acc = max(test_acc_list)
 print('max_test_acc: ', max_test_acc)

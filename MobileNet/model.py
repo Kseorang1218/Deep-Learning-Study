@@ -1,17 +1,10 @@
 import torch
 import torch.nn as nn
 
-# 원본 코드 확인용
-from torchvision import models
-models.mobilenet_v2
-# models.mobilenet
-
 class InvertedResidual(nn.Module):
     def __init__(self, in_channels, out_channels, stride, expand_ratio):
         super().__init__()
         self.stride = stride
-        if stride not in [1, 2]:
-            raise ValueError(f"stride should be 1 or 2 instead of {stride}")
         
         hidden_dim = int(round(in_channels * expand_ratio))
         self.use_res_connect = self.stride == 1 and in_channels == out_channels
@@ -67,11 +60,6 @@ class MobileNetV2(nn.Module):
             [6, 320, 1, 1],
         ]
 
-        if len(inverted_residual_setting) == 0 or len(inverted_residual_setting[0]) != 4:
-            raise ValueError(
-                f"inverted_residual_setting should be non-empty or a 4-element list, got {inverted_residual_setting}"
-            )
-        
         input_channel = int(input_channel*width_mult)
         last_channel = int(last_channel*width_mult)
 
@@ -103,7 +91,6 @@ class MobileNetV2(nn.Module):
         self.layers = nn.Sequential(*layers)
 
         self.pool = nn.AdaptiveAvgPool2d((1,1))
-        # self.pool = nn.AvgPool2d(7,7)
         self.dropout = nn.Dropout(p=dropout)
         self.fc = nn.Linear(last_channel, num_classes)
 
