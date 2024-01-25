@@ -114,7 +114,7 @@ def imshow(inp, title=None):
         plt.title(title)
     plt.pause(0.001)  # pause a bit so that plots are updated
 
-def visualize_model(model, num_images=9):
+def visualize_model(model, path, num_images=9):
     was_training = model.training
     model.eval()
     images_so_far = 0
@@ -135,7 +135,7 @@ def visualize_model(model, num_images=9):
                     axs[row, col].imshow(inputs.cpu().data[j].numpy().transpose((1, 2, 0)))
                     axs[row, col].axis('off')
                     axs[row, col].set_title('predicted: {}'.format(train_dataset.classes[preds[j]]))
-                    plt.savefig('./saved/result.png')
+                    plt.savefig(path)
                 images_so_far += 1
 
                 if images_so_far == num_images:
@@ -193,9 +193,9 @@ def test(model, test_loader, device, criterion, batch_size):
 파라미터 정의 
 '''
 BATCH_SIZE = 32
-EPOCHS = 100
+EPOCHS = 200
 LEARNING_RATE = 0.0001
-PATH = './saved/'
+PATH = './saved/epoch200/'
 
 
 
@@ -288,4 +288,4 @@ torch.save(model.state_dict(), PATH+'model.pth')
 
 # 학습 결과 시각화
 model.load_state_dict(model.state_dict())
-visualize_model(model)
+visualize_model(model, PATH+'result.png')
