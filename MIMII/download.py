@@ -45,7 +45,12 @@ def download_mimii(root: str, snr: str) -> pd.DataFrame:
         else:
             os.system(f"unzip {filename} -d {filedir}") # unzip 
 
-
+    # label map
+    # normal 0
+    # fan & abnormal 1
+    # pump & abnormal 2
+    # slider & abnormal 3
+    # valve & abnormal 4
 
     label_map = {
         ("fan", "normal"): 0,

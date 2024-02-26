@@ -89,7 +89,9 @@ def build_from_dataframe(
 
     for i in range(num_data):
         data_segment = df.iloc[i]["data"]
-        dataseg, labelseg = data_sampling(data_segment, sample_length, shift, 
+
+        # data segment로부터 dataseg, labelseg를 샘플링한 뒤 data에, label 리스트에 추가
+        dataseg, labelseg = data_sampling(data_segment, sample_length, shift,
                                           num_classes, df.iloc[i]["label"], is_onehot)
         data.append(dataseg)
         label.append(labelseg)
@@ -97,6 +99,7 @@ def build_from_dataframe(
     data_array = np.concatenate(tuple(data), axis=0)
     label_array = np.concatenate(tuple(label), axis=0)
 
+    # np.ndarray 타입의 data, label array 반환
     return data_array, label_array
      
 
@@ -106,7 +109,7 @@ def data_sampling(
         num_classes:int, classID:int, is_onehot: bool = False
         )-> Tuple[np.ndarray, np.ndarray]:
     """
-    데이터 segment로부터 샘플들을 만드는 함수
+    데이터 segment로부터 데이터, 레이블을 샘플링하는 함수
 
     Parameters
     ---------- 
@@ -131,13 +134,14 @@ def data_sampling(
     """
 
     sampled_data = np.array([
+        # data segment에서 sample_length만큼의 데이터를 shift만큼 이동해가며 np.ndarray 형태로 반환
         data_segment[i: i+sample_length]
-        for  i in range(0, len(data_segment)-sample_length, shift)
+        for i in range(0, len(data_segment)-sample_length, shift)
     ])
-    if is_onehot:
+    if is_onehot: # 원 핫 인코딩
         label = np.zeros((sampled_data.shape[0], num_classes))
         label[:, classID] = 1
-    else:
+    else: # 레이블 인코딩
         label = np.zeros((sampled_data.shape[0]))
         label = label + classID
     
