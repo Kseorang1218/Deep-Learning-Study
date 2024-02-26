@@ -147,5 +147,4 @@ class Model:
         return EfficientNet(num_classes, 1.8, 2.6, 528, 0.5)
     
     def EfficientNetb7(self, num_classes):
-        return EfficientNet(num_classes, 2.0, 3.1, 600, 0.5)
-    
+        return EfficientNet(num_classes, 2.0, 3.1, 600, 0.5)    
