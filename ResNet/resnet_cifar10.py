@@ -193,7 +193,7 @@ def test(model, test_loader, device, criterion, batch_size):
 파라미터 정의 
 '''
 BATCH_SIZE = 32
-EPOCHS = 2
+EPOCHS = 5
 LEARNING_RATE = 0.1
 PATH = './saved/resnet18/'
 
@@ -213,16 +213,16 @@ else:
 학습
 '''
 # 데이터셋 로드
-train_dataset = datasets.CIFAR10(root = "./data/",
+train_dataset = datasets.CIFAR10(root = "../../data/cifar10/",
                                  train = True,
                                  download = True,
                                  transform=transforms.ToTensor())
 
-test_dataset = datasets.CIFAR10(root = "./data/",
+test_dataset = datasets.CIFAR10(root = "../../data/cifar10/",
                                 train = False,
                                 transform=transforms.ToTensor())
 
-test_dataset_for_visualize = datasets.CIFAR10(root = "./data/",
+test_dataset_for_visualize = datasets.CIFAR10(root = "../../data/cifar10/",
                                 train = False,
                                 transform=transforms.ToTensor())
 

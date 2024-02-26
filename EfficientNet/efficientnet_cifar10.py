@@ -4,8 +4,6 @@ import torch.nn as nn
 
 from model import Model
 
-from torchsummary import summary
-
 # 이미지 확인
 from torchvision import utils
 import matplotlib.pyplot as plt
@@ -149,7 +147,6 @@ def visualize_model(model, path, num_images=9):
 
 
 '''학습에 사용되는 함수'''
-#train()
 def train(model, train_loader, optimizer, device, criterion, epoch, batch_size):
     model.train()
     train_loss = 0
@@ -171,7 +168,6 @@ def train(model, train_loader, optimizer, device, criterion, epoch, batch_size):
     train_accuracy = correct / len(train_loader.dataset)
     return train_loss, train_accuracy
     
-#test()
 def test(model, test_loader, device, criterion, batch_size):
     model.eval()
     test_loss = 0
@@ -197,9 +193,9 @@ def test(model, test_loader, device, criterion, batch_size):
 파라미터 정의 
 '''
 BATCH_SIZE = 32
-EPOCHS = 100
+EPOCHS = 300
 LEARNING_RATE = 0.0001
-PATH = './saved/epoch100/'
+PATH = './saved/epoch300/'
 
 
 
@@ -217,16 +213,16 @@ else:
 학습
 '''
 # 데이터셋 로드
-train_dataset = datasets.CIFAR10(root = "../data/cifar10/",
+train_dataset = datasets.CIFAR10(root = "../../data/cifar10/",
                                  train = True,
                                  download = True,
                                  transform=transforms.ToTensor())
 
-test_dataset = datasets.CIFAR10(root = "../data/cifar10/",
+test_dataset = datasets.CIFAR10(root = "../../data/cifar10/",
                                 train = False,
                                 transform=transforms.ToTensor())
 
-test_dataset_for_visualize = datasets.CIFAR10(root = "../data/cifar10/",
+test_dataset_for_visualize = datasets.CIFAR10(root = "../../data/cifar10/",
                                 train = False,
                                 transform=transforms.ToTensor())
 
@@ -250,8 +246,7 @@ test_loader_for_visualize = torch.utils.data.DataLoader(dataset = test_dataset_f
                                           shuffle = False)
 
 # 모델, optimizer, loss function, scheduler 정의
-model = Model().EfficientNetb0(10).to(DEVICE)
-# print(summary(model, (3,32,32)))
+model = Model().EfficientNetb0(num_classes=10).to(DEVICE)
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=0.0001)
 criterion = nn.CrossEntropyLoss()
 
