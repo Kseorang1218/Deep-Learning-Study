@@ -10,9 +10,9 @@ import funcs
 파라미터 정의 
 '''
 BATCH_SIZE = 32
-EPOCHS = 300
+EPOCHS = 2
 LEARNING_RATE = 0.0001
-SAVINGROOT = './saved/epoch300/'
+SAVINGROOT = './saved/epoch3'
 
 
 
@@ -76,7 +76,7 @@ test_loss_list = []
 
 # 학습 진행
 for epoch in range(1, EPOCHS + 1):
-    train_loss, train_accuracy = funcs.train(model, train_loader, optimizer, DEVICE, criterion, epoch, BATCH_SIZE)
+    train_loss, train_accuracy = funcs.train(model, train_loader, optimizer, DEVICE, criterion, BATCH_SIZE)
     train_acc_list.append(train_accuracy)
     train_loss_list.append(train_loss)
     print("[EPOCH: {}] \tTrain Loss: {:.4f}, \tTrain Accuracy: {:.4f}".format(
@@ -101,7 +101,7 @@ max_test_acc = max(test_acc_list)
 print('max_test_acc: ', max_test_acc)
 
 # 모델 저장
-torch.save(model.state_dict(), SAVINGROOT+'model.pth')
+torch.save(model.state_dict(), f"{SAVINGROOT}/model.pth")
 
 # 학습 결과 시각화
 model.load_state_dict(model.state_dict())

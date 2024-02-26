@@ -94,7 +94,7 @@ max_test_acc = max(test_acc_list)
 print('max_test_acc: ', max_test_acc)
 
 # 모델 저장
-torch.save(model.state_dict(), SAVINGROOT+'model.pth')
+torch.save(model.state_dict(), f"{SAVINGROOT}/model.pth")
 
 # 학습 결과 시각화
 model.load_state_dict(model.state_dict())
