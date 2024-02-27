@@ -98,4 +98,4 @@ torch.save(model.state_dict(), f"{SAVINGROOT}/model.pth")
 
 # 학습 결과 시각화
 model.load_state_dict(model.state_dict())
-funcs.visualize_model(model, SAVINGROOT, DEVICE, test_loader_for_visualize)
+funcs.visualize_model(model, SAVINGROOT, DEVICE, test_loader_for_visualize, train_dataset)

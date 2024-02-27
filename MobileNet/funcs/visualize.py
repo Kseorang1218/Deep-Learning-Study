@@ -57,7 +57,7 @@ def imshow(inp, title=None):
         plt.title(title)
     plt.pause(0.001)  # pause a bit so that plots are updated
 
-def visualize_model(model, root, device, dataloader, num_images=9):
+def visualize_model(model, root, device, dataloader, dataset, num_images=9):
 
     if not os.path.isdir(root):
         os.makedirs(root)
@@ -81,7 +81,7 @@ def visualize_model(model, root, device, dataloader, num_images=9):
                     col = images_so_far % 3
                     axs[row, col].imshow(inputs.cpu().data[j].numpy().transpose((1, 2, 0)))
                     axs[row, col].axis('off')
-                    axs[row, col].set_title('predicted: {}'.format(dataloader.classes[preds[j]]))
+                    axs[row, col].set_title('predicted: {}'.format(dataset.classes[preds[j]]))
                     plt.savefig(f"{root}/result.png")
                 images_so_far += 1
 

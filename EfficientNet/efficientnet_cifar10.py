@@ -12,7 +12,7 @@ import funcs
 BATCH_SIZE = 32
 EPOCHS = 2
 LEARNING_RATE = 0.0001
-SAVINGROOT = './saved/epoch3'
+SAVINGROOT = './saved/epoch2'
 
 
 
@@ -105,4 +105,4 @@ torch.save(model.state_dict(), f"{SAVINGROOT}/model.pth")
 
 # 학습 결과 시각화
 model.load_state_dict(model.state_dict())
-funcs.visualize_model(model, SAVINGROOT, DEVICE, test_loader_for_visualize)
+funcs.visualize_model(model, SAVINGROOT, DEVICE, test_loader_for_visualize, train_dataset)
