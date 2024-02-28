@@ -1,7 +1,6 @@
 import torch
 
-def train(
-        model, train_loader, optimizer, device, criterion, batch_size):
+def train(model, train_loader, optimizer, device, criterion, batch_size):
     model.train()
     train_loss = 0
     correct = 0

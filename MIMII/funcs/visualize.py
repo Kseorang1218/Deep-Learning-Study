@@ -2,20 +2,35 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import torch
+from typing import NoReturn
 
-def DrawGraph(acc_list, loss_list, title, mode, root):
-    '''
-    acc_list: train acc list or test acc list
-    loss_list: train loss list or test loss list
-    title: 그래프 제목
-    mode: train인지 valid인지
-    path: 그림 저장할 경로
+def DrawGraph(acc_list: list, loss_list: list, title: str, mode: str, root: str) -> NoReturn:
+    """
+    train, test 그래프를 그리는 함수
 
+    Parameters
+    ---------- 
+    acc_list: list
+        acc list
+    loss_list: list
+        loss list
+    title: str
+        그래프 제목
+    mode: str
+        train or test
+    root: str
+        저장 위치
+
+    Returns
+    ----------
+    NoReturn
+        그래프를 root 위치에 저장
+        
     Examples
     ----------
     >>> DrawGraph(train_acc_list, train_loss_list, 'train', mode='train', root="./saved/epoch100/")
         DrawGraph(test_acc_list, test_loss_list, 'test', mode='test', root="./saved/epoch100/")
-    '''
+    """
     mode = mode.lower()
     valid_modes = ['train', 'test']
     if mode not in valid_modes:

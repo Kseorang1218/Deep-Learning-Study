@@ -1,4 +1,5 @@
 import torch
+from typing import Any
 
 def train(
         model, train_loader, optimizer, device, criterion, batch_size):
