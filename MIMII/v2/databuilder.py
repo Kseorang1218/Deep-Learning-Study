@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from typing import Tuple
+from sklearn.model_selection import train_test_split
 
 
 def split_dataframe(df: pd.DataFrame):
@@ -37,14 +38,16 @@ def split_dataframe(df: pd.DataFrame):
             tmp_df["label"].append(row["label"])
 
     tmp_df = pd.DataFrame(tmp_df)
-    train_index = int(0.6 * tmp_df.index.stop) # 나머지 데이터의 0.6만큼을 train으로 사용
-    for idx, row in tmp_df.iterrows():
-        if idx > train_index:
-            val_df["data"].append(row["data"])
-            val_df["label"].append(row["label"])
-            continue
-        train_df["data"].append(row["data"])
-        train_df["label"].append(row["label"])
+    # tmp_df = tmp_df.sample(frac=1)
+    train_df, val_df = train_test_split(tmp_df, test_size=0.3)
+    # train_index = int(0.6 * tmp_df.index.stop) # 나머지 데이터의 0.6만큼을 train으로 사용
+    # for idx, row in tmp_df.iterrows():
+    #     if idx > train_index:
+    #         val_df["data"].append(row["data"])
+    #         val_df["label"].append(row["label"])
+    #         continue
+    #     train_df["data"].append(row["data"])
+    #     train_df["label"].append(row["label"])
 
     train_df = pd.DataFrame(train_df)
     val_df = pd.DataFrame(val_df)
