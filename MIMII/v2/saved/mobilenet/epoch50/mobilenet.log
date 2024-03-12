@@ -1,0 +1,161 @@
+../../../data/mimii/0_dB/fan.zip already exist.
+../../../data/mimii/0_dB/fan.zip already extracted.
+../../../data/mimii/0_dB/pump.zip already exist.
+../../../data/mimii/0_dB/pump.zip already extracted.
+../../../data/mimii/0_dB/slider.zip already exist.
+../../../data/mimii/0_dB/slider.zip already extracted.
+../../../data/mimii/0_dB/valve.zip already exist.
+../../../data/mimii/0_dB/valve.zip already extracted.
+[EPOCH: 1] 	Train Loss: 0.3373, 	Train Accuracy: 0.8986
+[EPOCH: 1] 	Test Loss: 0.8209, 	Test Accuracy: 0.8200
+
+[EPOCH: 2] 	Train Loss: 0.1674, 	Train Accuracy: 0.9483
+[EPOCH: 2] 	Test Loss: 0.7935, 	Test Accuracy: 0.8282
+
+[EPOCH: 3] 	Train Loss: 0.1369, 	Train Accuracy: 0.9571
+[EPOCH: 3] 	Test Loss: 0.8940, 	Test Accuracy: 0.7952
+
+[EPOCH: 4] 	Train Loss: 0.1212, 	Train Accuracy: 0.9612
+[EPOCH: 4] 	Test Loss: 0.9449, 	Test Accuracy: 0.8165
+
+[EPOCH: 5] 	Train Loss: 0.1103, 	Train Accuracy: 0.9643
+[EPOCH: 5] 	Test Loss: 0.9190, 	Test Accuracy: 0.8202
+
+[EPOCH: 6] 	Train Loss: 0.1035, 	Train Accuracy: 0.9663
+[EPOCH: 6] 	Test Loss: 0.8762, 	Test Accuracy: 0.7943
+
+[EPOCH: 7] 	Train Loss: 0.0974, 	Train Accuracy: 0.9681
+[EPOCH: 7] 	Test Loss: 0.9489, 	Test Accuracy: 0.7979
+
+[EPOCH: 8] 	Train Loss: 0.0932, 	Train Accuracy: 0.9694
+[EPOCH: 8] 	Test Loss: 0.8620, 	Test Accuracy: 0.8305
+
+[EPOCH: 9] 	Train Loss: 0.0892, 	Train Accuracy: 0.9703
+[EPOCH: 9] 	Test Loss: 0.9700, 	Test Accuracy: 0.7646
+
+[EPOCH: 10] 	Train Loss: 0.0863, 	Train Accuracy: 0.9713
+[EPOCH: 10] 	Test Loss: 0.9539, 	Test Accuracy: 0.8177
+
+[EPOCH: 11] 	Train Loss: 0.0839, 	Train Accuracy: 0.9717
+[EPOCH: 11] 	Test Loss: 1.0652, 	Test Accuracy: 0.7918
+
+[EPOCH: 12] 	Train Loss: 0.0815, 	Train Accuracy: 0.9727
+[EPOCH: 12] 	Test Loss: 0.9318, 	Test Accuracy: 0.8153
+
+[EPOCH: 13] 	Train Loss: 0.0797, 	Train Accuracy: 0.9732
+[EPOCH: 13] 	Test Loss: 0.8901, 	Test Accuracy: 0.8061
+
+[EPOCH: 14] 	Train Loss: 0.0778, 	Train Accuracy: 0.9738
+[EPOCH: 14] 	Test Loss: 0.9863, 	Test Accuracy: 0.7856
+
+[EPOCH: 15] 	Train Loss: 0.0763, 	Train Accuracy: 0.9744
+[EPOCH: 15] 	Test Loss: 1.0116, 	Test Accuracy: 0.7824
+
+[EPOCH: 16] 	Train Loss: 0.0749, 	Train Accuracy: 0.9748
+[EPOCH: 16] 	Test Loss: 0.9996, 	Test Accuracy: 0.7614
+
+[EPOCH: 17] 	Train Loss: 0.0729, 	Train Accuracy: 0.9753
+[EPOCH: 17] 	Test Loss: 0.9739, 	Test Accuracy: 0.7960
+
+[EPOCH: 18] 	Train Loss: 0.0720, 	Train Accuracy: 0.9756
+[EPOCH: 18] 	Test Loss: 1.0323, 	Test Accuracy: 0.7829
+
+[EPOCH: 19] 	Train Loss: 0.0703, 	Train Accuracy: 0.9759
+[EPOCH: 19] 	Test Loss: 0.9942, 	Test Accuracy: 0.7944
+
+[EPOCH: 20] 	Train Loss: 0.0696, 	Train Accuracy: 0.9763
+[EPOCH: 20] 	Test Loss: 0.9619, 	Test Accuracy: 0.7890
+
+[EPOCH: 21] 	Train Loss: 0.0689, 	Train Accuracy: 0.9767
+/data/home/kseorang/.pyenv/versions/3.8.10/lib/python3.8/site-packages/sklearn/metrics/_plot/confusion_matrix.py:129: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`). Consider using `matplotlib.pyplot.close()`.
+  fig, ax = plt.subplots()
+[EPOCH: 21] 	Test Loss: 0.8857, 	Test Accuracy: 0.8112
+
+[EPOCH: 22] 	Train Loss: 0.0677, 	Train Accuracy: 0.9768
+[EPOCH: 22] 	Test Loss: 1.0061, 	Test Accuracy: 0.8020
+
+[EPOCH: 23] 	Train Loss: 0.0668, 	Train Accuracy: 0.9770
+[EPOCH: 23] 	Test Loss: 0.9955, 	Test Accuracy: 0.8176
+
+[EPOCH: 24] 	Train Loss: 0.0660, 	Train Accuracy: 0.9774
+[EPOCH: 24] 	Test Loss: 0.9616, 	Test Accuracy: 0.8099
+
+[EPOCH: 25] 	Train Loss: 0.0653, 	Train Accuracy: 0.9775
+[EPOCH: 25] 	Test Loss: 1.0053, 	Test Accuracy: 0.7759
+
+[EPOCH: 26] 	Train Loss: 0.0638, 	Train Accuracy: 0.9781
+[EPOCH: 26] 	Test Loss: 1.0243, 	Test Accuracy: 0.7788
+
+[EPOCH: 27] 	Train Loss: 0.0636, 	Train Accuracy: 0.9781
+[EPOCH: 27] 	Test Loss: 1.0405, 	Test Accuracy: 0.7703
+
+[EPOCH: 28] 	Train Loss: 0.0627, 	Train Accuracy: 0.9784
+[EPOCH: 28] 	Test Loss: 1.0389, 	Test Accuracy: 0.7658
+
+[EPOCH: 29] 	Train Loss: 0.0621, 	Train Accuracy: 0.9785
+[EPOCH: 29] 	Test Loss: 1.0571, 	Test Accuracy: 0.7694
+
+[EPOCH: 30] 	Train Loss: 0.0615, 	Train Accuracy: 0.9787
+[EPOCH: 30] 	Test Loss: 1.0441, 	Test Accuracy: 0.7897
+
+[EPOCH: 31] 	Train Loss: 0.0611, 	Train Accuracy: 0.9788
+[EPOCH: 31] 	Test Loss: 1.0598, 	Test Accuracy: 0.7557
+
+[EPOCH: 32] 	Train Loss: 0.0602, 	Train Accuracy: 0.9791
+[EPOCH: 32] 	Test Loss: 1.1611, 	Test Accuracy: 0.7225
+
+[EPOCH: 33] 	Train Loss: 0.0599, 	Train Accuracy: 0.9792
+[EPOCH: 33] 	Test Loss: 1.0003, 	Test Accuracy: 0.8033
+
+[EPOCH: 34] 	Train Loss: 0.0596, 	Train Accuracy: 0.9793
+[EPOCH: 34] 	Test Loss: 1.0764, 	Test Accuracy: 0.7617
+
+[EPOCH: 35] 	Train Loss: 0.0582, 	Train Accuracy: 0.9797
+[EPOCH: 35] 	Test Loss: 1.1032, 	Test Accuracy: 0.7858
+
+[EPOCH: 36] 	Train Loss: 0.0580, 	Train Accuracy: 0.9798
+[EPOCH: 36] 	Test Loss: 1.0892, 	Test Accuracy: 0.8032
+
+[EPOCH: 37] 	Train Loss: 0.0580, 	Train Accuracy: 0.9798
+[EPOCH: 37] 	Test Loss: 1.0653, 	Test Accuracy: 0.7870
+
+[EPOCH: 38] 	Train Loss: 0.0572, 	Train Accuracy: 0.9801
+[EPOCH: 38] 	Test Loss: 1.0631, 	Test Accuracy: 0.7801
+
+[EPOCH: 39] 	Train Loss: 0.0568, 	Train Accuracy: 0.9802
+[EPOCH: 39] 	Test Loss: 1.0069, 	Test Accuracy: 0.7884
+
+[EPOCH: 40] 	Train Loss: 0.0561, 	Train Accuracy: 0.9804
+[EPOCH: 40] 	Test Loss: 1.1238, 	Test Accuracy: 0.7870
+
+[EPOCH: 41] 	Train Loss: 0.0557, 	Train Accuracy: 0.9805
+[EPOCH: 41] 	Test Loss: 1.0425, 	Test Accuracy: 0.7662
+
+[EPOCH: 42] 	Train Loss: 0.0556, 	Train Accuracy: 0.9806
+[EPOCH: 42] 	Test Loss: 1.1341, 	Test Accuracy: 0.7759
+
+[EPOCH: 43] 	Train Loss: 0.0548, 	Train Accuracy: 0.9808
+[EPOCH: 43] 	Test Loss: 1.0604, 	Test Accuracy: 0.7835
+
+[EPOCH: 44] 	Train Loss: 0.0547, 	Train Accuracy: 0.9808
+[EPOCH: 44] 	Test Loss: 1.0794, 	Test Accuracy: 0.7999
+
+[EPOCH: 45] 	Train Loss: 0.0545, 	Train Accuracy: 0.9809
+[EPOCH: 45] 	Test Loss: 1.0859, 	Test Accuracy: 0.7470
+
+[EPOCH: 46] 	Train Loss: 0.0539, 	Train Accuracy: 0.9812
+[EPOCH: 46] 	Test Loss: 1.1094, 	Test Accuracy: 0.7830
+
+[EPOCH: 47] 	Train Loss: 0.0537, 	Train Accuracy: 0.9812
+[EPOCH: 47] 	Test Loss: 1.0824, 	Test Accuracy: 0.7837
+
+[EPOCH: 48] 	Train Loss: 0.0531, 	Train Accuracy: 0.9813
+[EPOCH: 48] 	Test Loss: 1.0366, 	Test Accuracy: 0.7992
+
+[EPOCH: 49] 	Train Loss: 0.0531, 	Train Accuracy: 0.9813
+[EPOCH: 49] 	Test Loss: 1.1152, 	Test Accuracy: 0.7775
+
+[EPOCH: 50] 	Train Loss: 0.0524, 	Train Accuracy: 0.9815
+[EPOCH: 50] 	Test Loss: 0.9640, 	Test Accuracy: 0.8014
+
+max_test_acc:  0.8304872345823158
