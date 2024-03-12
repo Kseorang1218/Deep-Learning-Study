@@ -1,8 +1,11 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import os
 import torch
+import matplotlib.pyplot as plt
 from typing import NoReturn
+from sklearn.metrics import ConfusionMatrixDisplay
+
+from .utils import Get_ConfusionMatrix
 
 def DrawGraph(acc_list: list, loss_list: list, title: str, mode: str, root: str) -> NoReturn:
     """
@@ -72,7 +75,8 @@ def imshow(inp, title=None):
         plt.title(title)
     plt.pause(0.001)  # pause a bit so that plots are updated
 
-def visualize_model(model, root, device, dataloader, dataset, num_images=9):
+
+def Visualize_model(model, root, device, dataloader, dataset, num_images=9):
 
     if not os.path.isdir(root):
         os.makedirs(root)
@@ -104,3 +108,15 @@ def visualize_model(model, root, device, dataloader, dataset, num_images=9):
                     model.train(mode=was_training)
                     return
         model.train(mode=was_training)
+
+        
+def Visualize_ConfusionMatrix(label, prediction, title, root):
+
+    if not os.path.isdir(root):
+        os.makedirs(root)
+
+    matrix = Get_ConfusionMatrix(label, prediction)
+    disp = ConfusionMatrixDisplay(matrix)
+    disp.plot()
+    
+    plt.savefig(f"{root}/epoch{title}.png")
