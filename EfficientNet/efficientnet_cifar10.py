@@ -10,9 +10,9 @@ import funcs
 파라미터 정의 
 '''
 BATCH_SIZE = 32
-EPOCHS = 2
+EPOCHS = 3
 LEARNING_RATE = 0.0001
-SAVINGROOT = './saved/epoch2'
+SAVINGROOT = './saved/epoch3'
 
 
 
@@ -82,7 +82,7 @@ for epoch in range(1, EPOCHS + 1):
     print("[EPOCH: {}] \tTrain Loss: {:.4f}, \tTrain Accuracy: {:.4f}".format(
         epoch, train_loss, train_accuracy))
 
-    test_loss, test_accuracy = funcs.test(model, test_loader, DEVICE, criterion, BATCH_SIZE)
+    test_loss, test_accuracy = funcs.test_with_confusionmatrix_f1scores(model, test_loader, DEVICE, criterion, BATCH_SIZE, epoch, f"{SAVINGROOT}/ConfusionMatrix")
     test_acc_list.append(test_accuracy)
     test_loss_list.append(test_loss)
 
@@ -104,5 +104,5 @@ print('max_test_acc: ', max_test_acc)
 torch.save(model.state_dict(), f"{SAVINGROOT}/model.pth")
 
 # 학습 결과 시각화
-model.load_state_dict(model.state_dict())
-funcs.visualize_model(model, SAVINGROOT, DEVICE, test_loader_for_visualize, train_dataset)
+# model.load_state_dict(model.state_dict())
+# funcs.visualize_model(model, SAVINGROOT, DEVICE, test_loader_for_visualize, train_dataset)
