@@ -28,6 +28,10 @@ def download_mimii(data_root_dir: str, snr: str) -> None:
     if not os.path.isdir(data_dir):
         os.makedirs(data_dir)
 
+    phase_dir = os.listdir(data_dir)
+    if "train" or "test" or "val" in phase_dir:
+        return
+
     baseurl = "https://zenodo.org/records/3384388/files/"
     machinetypes = ["fan", "pump", "slider", "valve"]
     modelIDs = ["id_00", "id_02", "id_04", "id_06"]
@@ -151,7 +155,7 @@ def move_to_val_dir(directory, modelID):
     random.seed(42)
     all_wav_files = glob.glob(os.path.join(directory, '*.wav'))
     abnormal_files = sorted([f for f in all_wav_files if 'abnormal' in f and modelID in f])
-    print(abnormal_files)
+    # print(abnormal_files)
     num_abnormal_files = len(abnormal_files)
 
     normal_files = sorted([f for f in all_wav_files if 'normal' in f and modelID in f and 'abnormal' not in f])
@@ -159,14 +163,14 @@ def move_to_val_dir(directory, modelID):
 
     for file in abnormal_files:
         src_file =  file
-        print(src_file)
+        # print(src_file)
         dst_file = os.path.join(directory, "val")
         # print(dst_file)
         shutil.move(src_file, dst_file)
 
     for file in selected_normal_files:
         src_file =  file
-        print(src_file)
+        # print(src_file)
         dst_file = os.path.join(directory, "val")
-        print(dst_file)
+        # print(dst_file)
         shutil.move(src_file, dst_file)
