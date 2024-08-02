@@ -27,7 +27,7 @@ class MIMIIDataset(Dataset):
         label = self.meta2label_dic[f"{machinetype}-{modelID}"]
         x, _ = librosa.load(filename, sr=sampling_rate)
         x_wav = torch.from_numpy(x)
-        x_mel = melspectogram(x_wav)
+        x_mel = self.melspectogram(x_wav)
         return x_wav, x_mel, label
 
         

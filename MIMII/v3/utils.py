@@ -3,6 +3,7 @@ import os
 import glob
 import itertools
 import re
+import numpy as np
 
 # TODO
 def get_filename_list(dir_path, pattern='*', ext='*'):
@@ -39,3 +40,31 @@ def get_machine_id_list(data_dir):
         itertools.chain.from_iterable([re.findall('id_[0-9][0-9]', ext_id) for ext_id in get_filename_list(data_dir)])
     )))
     return machine_id_list
+
+def create_val_file_list(target_dir,
+                          id_name,
+                          dir_name='val',
+                          prefix_normal='normal',
+                          prefix_anomaly='abnormal',
+                          ext='wav'):
+    normal_files_path = f'{target_dir}/{prefix_normal}_{id_name}*.{ext}'
+    normal_files = sorted(glob.glob(normal_files_path))
+    normal_labels = np.zeros(len(normal_files))
+
+    anomaly_files_path = f'{target_dir}/{prefix_anomaly}_{id_name}*.{ext}'
+    anomaly_files = sorted(glob.glob(anomaly_files_path))
+    anomaly_labels = np.ones(len(anomaly_files))
+
+    files = np.concatenate((normal_files, anomaly_files), axis=0)
+    labels = np.concatenate((normal_labels, anomaly_labels), axis=0)
+    return files, labels
+
+def save_model_state_dict(file_path, epoch=None, model=None, optimizer=None):
+    import torch
+    state_dict = {
+        'epoch': epoch,
+        'optimizer': optimizer.state_dict() if optimizer else None,
+        'model': model.state_dict() if model else None,
+    }
+    torch.save(state_dict, file_path)
+
