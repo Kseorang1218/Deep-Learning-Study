@@ -4,6 +4,10 @@ import glob
 import itertools
 import re
 import numpy as np
+from sklearn.metrics import f1_score 
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
 
 # TODO
 def get_filename_list(dir_path, pattern='*', ext='*'):
@@ -68,3 +72,62 @@ def save_model_state_dict(file_path, epoch=None, model=None, optimizer=None):
     }
     torch.save(state_dict, file_path)
 
+def Visualize_ConfusionMatrix(label, prediction, title, root):
+    if not os.path.isdir(root):
+        os.makedirs(root)
+
+    matrix = Get_ConfusionMatrix(label, prediction)
+    disp = ConfusionMatrixDisplay(matrix)
+    fig, ax = plt.subplots()
+    disp.plot(ax=ax)
+
+    if title is None:
+        title = ""
+    
+    plt.savefig(f"{root}/epoch{title}.png")
+    plt.close(fig)  # 피규어 닫기
+    
+
+    
+def Get_ConfusionMatrix(label, prediction):
+    # 텐서일 경우 detach().cpu().numpy()로 변환
+    label = [row.detach().cpu().numpy() if hasattr(row, 'detach') else row for row in label]
+    prediction = [row.detach().cpu().numpy() if hasattr(row, 'detach') else row for row in prediction]
+
+    # 넘파이 배열로 변환
+    label = np.array(label)
+    prediction = np.array(prediction)
+
+    # 연속형 예측을 이진형으로 변환 (임계값 0.5 기준)
+    prediction = (prediction >= 0.5).astype(int)
+
+    matrix = confusion_matrix(label, prediction)
+    return matrix
+
+
+def Get_F1Score(label, prediction, epoch, root):
+    if not os.path.isdir(root):
+        os.makedirs(root)
+    
+    # 텐서일 경우 detach().cpu().numpy()로 변환
+    label = [row.detach().cpu().numpy() if hasattr(row, 'detach') else row for row in label]
+    prediction = [row.detach().cpu().numpy() if hasattr(row, 'detach') else row for row in prediction]
+
+    # 넘파이 배열로 변환
+    label = np.array(label)
+    prediction = np.array(prediction)
+
+    # 연속형 예측을 이진형으로 변환 (임계값 0.5 기준)
+    prediction = (prediction >= 0.5).astype(int)
+
+    F1Score = f1_score(label, prediction, average='macro')
+    if epoch == None:
+        epoch = ""
+    
+    with open(f"{root}/f1scores.log", "a") as f:
+        f.write(f"[epoch] {epoch}\n")
+        f.write(f"[F1 score] {F1Score}\n")
+        f.write(f"\n")
+        f.close()
+
+    return F1Score

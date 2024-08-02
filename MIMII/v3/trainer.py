@@ -5,8 +5,7 @@ from sklearn.metrics import roc_auc_score
 import numpy as np
 import os
 
-from utils import get_machine_id_list, create_val_file_list, save_model_state_dict, get_filename_list
-
+from utils import get_machine_id_list, create_val_file_list, save_model_state_dict, get_filename_list, Visualize_ConfusionMatrix, Get_F1Score
 class Trainer:
     def __init__(
             self, model, epoch, device, criterion, optimizer, start_valid_epoch, valid_interval,
@@ -52,7 +51,7 @@ class Trainer:
 
             # val
             if (epoch - start_valid_epoch) % valid_interval == 0 and epoch >= start_valid_epoch:
-                avg_auc, avg_pauc = self.val()
+                avg_auc, avg_pauc = self.val(epoch)
                 if avg_auc + avg_pauc >= best_metric:
                     no_better_epoch = 0
                     best_metric = avg_auc + avg_pauc
@@ -70,7 +69,7 @@ class Trainer:
                     
                 
 
-    def val(self):
+    def val(self, epoch=None):
         self.model.eval()
         model = self.model
         sum_auc, sum_pauc, num = 0, 0, 0
@@ -91,7 +90,9 @@ class Trainer:
                     label = torch.tensor([label]).long().to(self.device)
                     with torch.no_grad():
                         predict_ids, _ = model(x_wav, x_mel, label)
+                        # print(predict_ids)
                         probs = - torch.log_softmax(predict_ids, dim=1).mean(dim=0).squeeze().cpu().numpy()
+                        # print(probs)
                         y_pred[file_idx] = probs[label]
 
                 # compute auc and pAuc
@@ -99,13 +100,17 @@ class Trainer:
                 auc = roc_auc_score(y_true, y_pred)
                 pauc = roc_auc_score(y_true, y_pred, max_fpr=max_fpr)
                 performance.append([auc, pauc])
+        
             avg_performance = np.mean(np.array(performance, dtype=float), axis=0)
             mean_auc, mean_pauc = avg_performance[0], avg_performance[1]
             print(f"{machinetype}\t\tAUC: {mean_auc*100:.3f}\tpAUC: {mean_pauc*100:.3f}")
+            
             sum_auc += mean_auc
             sum_pauc += mean_pauc
             num += 1
         avg_auc, avg_pauc = sum_auc / num, sum_pauc / num
+        f1score = Get_F1Score(y_true, y_pred, epoch, f"./saved/{self.snr}/f1scores")
+        Visualize_ConfusionMatrix(y_true, y_pred, epoch, f"./saved/{self.snr}/confusionmat")
         print(f'Total average:\t\tAUC: {avg_auc*100:.3f}\tpAUC: {avg_pauc*100:.3f}')
         return avg_auc, avg_pauc
     
