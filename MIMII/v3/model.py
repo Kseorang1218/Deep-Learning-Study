@@ -50,3 +50,8 @@ class TgramNet(nn.Module):
         out = self.conv_blocks(out)
 
         return out
+    
+if __name__ == '__main__':
+    net = STgramMFN(num_class=10)
+    x_wav = torch.randn((2, 16000*2))
+    print(x_wav.size())

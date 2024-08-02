@@ -61,11 +61,6 @@ model = STgramMFN(num_class).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=float(1e-4))
 loss = CrossEntropyLoss()
 
-# files, labels = create_test_file_list("../data/0_dB/fan/val", "id_00")
-# print(files)
-# # print(labels)
-# print(meta2label_dic)
-
 trainer = Trainer(model=model, epoch=epoch, device=device, criterion=loss,optimizer=optimizer,
                   start_valid_epoch=0, valid_interval=valid_interval, train_dirs=train_dirs, valid_dirs=val_dirs, test_dirs=test_dirs,
                   meta2label_dic=meta2label_dic, transform=train_dataset.transform, snr=snr)
@@ -75,5 +70,5 @@ model_path = os.path.join("../model", f'{load_epoch}_checkpoint_{snr}.pth.tar')
 state_dict = torch.load(model_path, map_location=device, weights_only=True)['model']
 trainer.model.load_state_dict(state_dict)
 
-trainer.val()
+trainer.val(save=True)
 trainer.test()

@@ -18,8 +18,8 @@ class MIMIIDataset(Dataset):
         return len(self.file_list)
     
     def __getitem__(self, idx):
-        x_wav, x_mel, label = self.transform(self.file_list[idx])
-        return x_wav, x_mel, label
+        data_item = self.transform(self.file_list[idx])
+        return data_item
     
     def transform(self, filename):
         machinetype = filename.split("/")[-3]

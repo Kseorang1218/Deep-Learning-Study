@@ -8,6 +8,7 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
+import csv
 
 # TODO
 def get_filename_list(dir_path, pattern='*', ext='*'):
@@ -131,3 +132,8 @@ def Get_F1Score(label, prediction, epoch, root):
         f.close()
 
     return F1Score
+
+def save_csv(file_path, data: list):
+    with open(file_path, 'w', newline='') as f:
+        writer = csv.writer(f, lineterminator='\n')
+        writer.writerows(data)
