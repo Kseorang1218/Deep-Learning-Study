@@ -13,7 +13,6 @@ class STgramMFN(nn.Module):
         self.tgramnet = TgramNet(n_mels=n_mels, win_length=win_length, hop_length=hop_length)
         self.mobilefacenet = MobileFaceNet(num_class)
 
-    # TODO
     def forward(self, x_wav, x_mel, label=None):
         x_wav, x_mel = x_wav.unsqueeze(1), x_mel.unsqueeze(1)
         x_t = self.tgramnet(x_wav).unsqueeze(1)

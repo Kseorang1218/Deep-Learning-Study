@@ -28,14 +28,15 @@ class Trainer:
         self.start_save_model_epochs = 10
 
     def train(self, train_loader):
-        model_dir = "./model"
+        snr = self.snr
+        model_dir = f"./model/{snr}"
+        os.makedirs(model_dir, exist_ok=True)
         best_metric = 0
         early_stop_epochs = self.early_stop_epochs
         start_valid_epoch = self.start_valid_epoch
         valid_interval = self.valid_interval
         epoch = self.epoch
         num_steps = len(train_loader)
-        snr = self.snr
         no_better_epoch = 0
         for epoch in range(0, epoch + 1):
             self.model.train()
@@ -43,8 +44,9 @@ class Trainer:
             train_bar = tqdm(train_loader, total=num_steps, desc=f"Epoch-{epoch}")
             for (x_wavs, x_mels, labels) in train_bar:
                 x_wavs, x_mels = x_wavs.float().to(self.device), x_mels.float().to(self.device)
-                labels = labels.reshape(-1).long().to(self.device)
+                labels = labels.to(self.device)
                 output, _ = self.model(x_wavs, x_mels, labels)
+                # print(labels.size())
                 loss = self.criterion(output, labels)
                 # loss 표시
                 train_bar.set_postfix(loss=f'{loss.item():.5f}')
@@ -73,7 +75,7 @@ class Trainer:
                     no_better_epoch += 1
                     if no_better_epoch > early_stop_epochs > 0: break
             if epoch >= self.start_save_model_epochs:
-                if (epoch - self.start_save_model_epochs) % 1 == 0:
+                if (epoch - self.start_save_model_epochs) % 10 == 0:
                     model_path = os.path.join(model_dir, f'{epoch}_checkpoint.pth_{snr}.tar')
                     save_model_state_dict(model_path, epoch=epoch,
                                                 model=self.model,

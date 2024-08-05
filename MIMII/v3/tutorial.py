@@ -12,8 +12,7 @@ import torch
 
 """constants"""
 data_dir = "../data"
-train_dir = ""
-snr = "6_dB"
+snr = "-6_dB"
 train_dirs = [
     os.path.join(data_dir, snr, "fan/train"),
     os.path.join(data_dir, snr, "pump/train"),
@@ -50,6 +49,7 @@ for train_dir in train_dirs:
     train_file_list.extend(get_filename_list(train_dir))
 
 meta2label_dic, label2meta_dic = metadata_to_label(train_dirs+test_dirs)
+# print(label2meta_dic)
 
 train_dataset = MIMIIDataset(train_file_list, meta2label_dic)
 train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
@@ -66,7 +66,7 @@ trainer = Trainer(model=model, epoch=epoch, device=device, criterion=loss,optimi
                   meta2label_dic=meta2label_dic, transform=train_dataset.transform, snr=snr)
 
 trainer.train(train_loader=train_dataloader)
-model_path = os.path.join("../model", f'{load_epoch}_checkpoint_{snr}.pth.tar')
+model_path = os.path.join(f"./model/{snr}", f'{load_epoch}_checkpoint_{snr}.pth.tar')
 state_dict = torch.load(model_path, map_location=device, weights_only=True)['model']
 trainer.model.load_state_dict(state_dict)
 
