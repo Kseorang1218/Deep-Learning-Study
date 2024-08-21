@@ -3,4 +3,4 @@ data/
 dataset/
 __pycache__
 model/
-result/
+*csv

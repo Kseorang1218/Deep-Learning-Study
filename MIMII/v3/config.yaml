@@ -1,0 +1,28 @@
+seed: 42
+
+data_dir: './data'
+snr: '6_dB'
+
+train_dirs:
+  - 'fan/train'
+  - 'pump/train'
+  - 'slider/train'
+  - 'valve/train'
+
+val_dirs:
+  - 'fan/val'
+  - 'pump/val'
+  - 'slider/val'
+  - 'valve/val'
+
+test_dirs:
+  - 'fan/test'
+  - 'pump/test'
+  - 'slider/test'
+  - 'valve/test'
+
+batch_size: 64
+
+epoch: 100
+valid_interval: 10
+load_epoch: 'best'
