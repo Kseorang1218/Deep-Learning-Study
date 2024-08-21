@@ -1,7 +1,7 @@
 # model.py
 import torch.nn as nn
-from MobileFaceNet import MobileFaceNet
-from ArcMarginProduct import ArcMarginProduct
+from funs.MobileFaceNet import MobileFaceNet
+from funs.ArcMarginProduct import ArcMarginProduct
 import torch
 
 class STgramMFN(nn.Module):

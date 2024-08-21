@@ -5,7 +5,7 @@ from sklearn.metrics import roc_auc_score
 import numpy as np
 import os
 
-from utils import *
+from funs.utils import *
 
 class Trainer:
     def __init__(

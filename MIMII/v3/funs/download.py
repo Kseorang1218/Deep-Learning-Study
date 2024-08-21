@@ -1,9 +1,14 @@
 # download.py
 import os
-import pandas as pd
 import shutil
 import glob
 import random
+
+
+MACHINETYPE_LIST = ["fan", "pump", "slider", "valve"]
+MODELID_LIST = ["id_00", "id_02", "id_04", "id_06"]
+FAULTTYPE_LIST = ["abnormal", "normal"]
+PHASE_LIST = ["train", "test", "val"]
 
 def download_mimii(data_root_dir: str, snr: str) -> None:
     """
@@ -21,23 +26,15 @@ def download_mimii(data_root_dir: str, snr: str) -> None:
         
     Examples
     ----------
-    >>> df = download_mimii("../data", "0_dB")
+    >>> df = download_mimii("./data", "0_dB")
     """
-
     data_dir = os.path.join(data_root_dir, snr)# 데이터셋을 저장할 디렉토리
     if not os.path.isdir(data_dir):
         os.makedirs(data_dir)
 
-    phase_dir = os.listdir(data_dir)
-    if "train" or "test" or "val" in phase_dir:
-        return
-
     baseurl = "https://zenodo.org/records/3384388/files/"
-    machinetypes = ["fan", "pump", "slider", "valve"]
-    modelIDs = ["id_00", "id_02", "id_04", "id_06"]
-    conditions = ["abnormal", "normal"]
 
-    for machinetype in machinetypes:
+    for machinetype in MACHINETYPE_LIST:
         machinetype_dir = os.path.join(data_dir, machinetype)
 
         filename = os.path.join(data_dir, f"{machinetype}.zip") # 파일을 저장할 이름
@@ -54,16 +51,21 @@ def download_mimii(data_root_dir: str, snr: str) -> None:
         else:
             print(f"{filename} already exist.")
 
+
         # 파일이 이미 압축 해제된 경우 확인
         if os.path.exists(machinetype_dir):
                 print(f"{filename} already extracted.")
         else:
             os.system(f"unzip {filename} -d {data_dir}") # unzip 
+            
         
         # 파일 이름 및 파일 위치 변경 
-        for modelID in modelIDs:
-            for condition in conditions:
+        for modelID in MODELID_LIST:
+            for condition in FAULTTYPE_LIST:
                 target_dir = os.path.join(machinetype_dir, modelID, condition)
+                if not os.path.exists(target_dir):
+                    continue
+
                 wav_files = os.listdir(target_dir)
                 for wav_file in wav_files:
                     old_path = os.path.join(target_dir, wav_file)
@@ -74,10 +76,6 @@ def download_mimii(data_root_dir: str, snr: str) -> None:
                     # unused 디렉토리 삭제
                     if not os.listdir(target_dir):
                         os.rmdir(target_dir)
-                # unused 디렉토리 삭제
-                condition_dir = os.path.join(machinetype_dir, modelID, condition)
-                if os.path.exists(condition_dir) and not os.listdir(condition_dir):
-                    os.rmdir(condition_dir)
             # unused 디렉토리 삭제
             modelID_dir = os.path.join(machinetype_dir, modelID)
             if os.path.exists(modelID_dir) and not os.listdir(modelID_dir):
@@ -103,10 +101,10 @@ def is_contain_wav_files(directory : str) -> bool:
         print(f"{directory} doesn't exist.")
         return False
     
-    for filename in os.listdir(directory):
-        if filename.endswith(".wav"):
+    for root, _, files in os.walk(directory):
+        if any(file.endswith(".wav") for file in files):
             return True
-    return False
+    return False   
 
 def split_dirs(data_root_dir, snr):
     """
@@ -120,30 +118,26 @@ def split_dirs(data_root_dir, snr):
         print(f"{data_dir} doesn't exist. Download data first.")
         return
 
-    machinetypes = ["fan", "pump", "slider", "valve"]
-    modelIDs = ["id_00", "id_02", "id_04", "id_06"]
-    for machinetype in machinetypes:
+    for machinetype in MACHINETYPE_LIST:
         machinetype_dir = os.path.join(data_dir, machinetype)
         # print(machinetype_dir)
 
-        for phase in ["train", "test", "val"]:
+        for phase in PHASE_LIST:
             phase_dir = os.path.join(machinetype_dir, phase)
             if not os.path.isdir(phase_dir):
                 os.makedirs(phase_dir)
 
         files = os.listdir(machinetype_dir)
 
-        for file in files:
-            # make test dir
-            if "id_06" in file:
-                src_file = os.path.join(machinetype_dir, file)
-                dst_file = os.path.join(machinetype_dir, "test", file)
-                shutil.move(src_file, dst_file)
-        
-        for modelID in modelIDs:
-            move_to_val_dir(machinetype_dir, modelID)   
 
-        files = [f for f in os.listdir(machinetype_dir) if f not in ["val", "train", "test"]]
+        for modelID in MODELID_LIST:
+            if modelID in ['id_00', 'id_04']:
+                move_to_dir(machinetype_dir, modelID, 'val')
+            elif modelID in ['id_02', 'id_06']:
+                move_to_dir(machinetype_dir, modelID, 'test')
+        
+
+        files = [f for f in os.listdir(machinetype_dir) if f not in PHASE_LIST]
 
         for file in files:
             src_file = os.path.join(machinetype_dir, file)
@@ -151,26 +145,26 @@ def split_dirs(data_root_dir, snr):
             shutil.move(src_file, dst_file)
 
 
-def move_to_val_dir(directory, modelID):
-    random.seed(42)
+def move_to_dir(directory, modelID, dir_type):
     all_wav_files = glob.glob(os.path.join(directory, '*.wav'))
     abnormal_files = sorted([f for f in all_wav_files if 'abnormal' in f and modelID in f])
     # print(abnormal_files)
     num_abnormal_files = len(abnormal_files)
 
     normal_files = sorted([f for f in all_wav_files if 'normal' in f and modelID in f and 'abnormal' not in f])
+    # print(len(normal_files))
     selected_normal_files = random.sample(normal_files, min(num_abnormal_files, len(normal_files)))
 
     for file in abnormal_files:
         src_file =  file
         # print(src_file)
-        dst_file = os.path.join(directory, "val")
+        dst_file = os.path.join(directory, dir_type)
         # print(dst_file)
         shutil.move(src_file, dst_file)
 
     for file in selected_normal_files:
         src_file =  file
         # print(src_file)
-        dst_file = os.path.join(directory, "val")
+        dst_file = os.path.join(directory, dir_type)
         # print(dst_file)
         shutil.move(src_file, dst_file)

@@ -10,6 +10,49 @@ from sklearn.metrics import ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 import csv
 
+import yaml
+from box import Box
+
+import torch
+import numpy as np
+
+import random
+
+def load_yaml(config_yaml_file: str):
+    """
+    YAML 파일을 읽어와 Box 객체로 변환하는 함수.
+
+    Parameters
+    ----------
+    config_yaml_file : str
+        읽을 YAML 파일의 경로.
+
+    Returns
+    ----------
+    config : Box
+        YAML 파일의 내용을 포함한 Box 객체
+    """
+    with open(config_yaml_file) as f:
+        config_yaml = yaml.load(f, Loader=yaml.FullLoader)
+        config = Box(config_yaml)
+    return config
+
+def set_seed(seed: int):
+    """
+    랜덤 시드 고정 함수.
+
+    Parameters
+    ----------
+    seed : int
+        고정할 시드 값
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    # CUDA를 사용하는 경우
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
 # TODO
 def get_filename_list(dir_path, pattern='*', ext='*'):
     """

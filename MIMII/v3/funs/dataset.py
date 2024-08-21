@@ -4,7 +4,7 @@ import torch
 import librosa
 import re
 
-from processing import melspectogram
+from funs.processing import melspectogram
 
 sampling_rate=16000
 
