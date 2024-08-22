@@ -1,7 +1,7 @@
 seed: 42
 
 data_dir: './data'
-snr: '6_dB'
+snr: '-6_dB'
 
 train_dirs:
   - 'fan/train'
