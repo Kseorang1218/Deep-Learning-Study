@@ -1,0 +1,37 @@
+seed: 42
+
+data_dir: './data'
+snr: '0_dB'
+sample_rate: 16000
+
+train_dirs:
+  - 'fan/train'
+  - 'pump/train'
+  - 'slider/train'
+  - 'valve/train'
+
+val_dirs:
+  - 'fan/val'
+  - 'pump/val'
+  - 'slider/val'
+  - 'valve/val'
+
+test_dirs:
+  - 'fan/test'
+  - 'pump/test'
+  - 'slider/test'
+  - 'valve/test'
+
+val_model_id:
+  - 'id_00'
+  - 'id_04'
+
+test_model_id:
+  - 'id_02'
+  - 'id_06'
+
+batch_size: 64
+
+epoch: 100
+valid_interval: 10
+load_epoch: 'best'
