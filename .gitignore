@@ -3,5 +3,4 @@ data/
 dataset/
 __pycache__
 model/
-*csv
 log/
