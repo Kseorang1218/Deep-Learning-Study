@@ -10,7 +10,7 @@ from funs.utils import *
 class Trainer:
     def __init__(
             self, model, epoch, device, criterion, optimizer, start_valid_epoch, valid_interval,
-            train_dirs, valid_dirs, test_dirs, meta2label_dic, transform, snr):
+            train_dirs, valid_dirs, test_dirs, meta2label_dic, transform):
         self.model = model
         self.epoch = epoch
         self.device = device
@@ -23,13 +23,11 @@ class Trainer:
         self.test_dirs = test_dirs
         self.meta2label_dic = meta2label_dic
         self.transform = transform
-        self.snr = snr
         self.early_stop_epochs = -1
         self.start_save_model_epochs = 10
 
     def train(self, train_loader):
-        snr = self.snr
-        model_dir = f"./model/{snr}"
+        model_dir = f"./model/DCASE"
         os.makedirs(model_dir, exist_ok=True)
         best_metric = 0
         early_stop_epochs = self.early_stop_epochs
@@ -65,7 +63,7 @@ class Trainer:
                 if avg_auc + avg_pauc >= best_metric:
                     no_better_epoch = 0
                     best_metric = avg_auc + avg_pauc
-                    best_model_path = os.path.join(model_dir, f'best_checkpoint_{snr}.pth.tar') # TODO: 모델 디렉토리 없으면 만드는 코드 
+                    best_model_path = os.path.join(model_dir, f'best_checkpoint.pth.tar') 
                     save_model_state_dict(best_model_path, epoch=epoch,
                                                 model=self.model,
                                                 optimizer=None)
@@ -76,7 +74,7 @@ class Trainer:
                     if no_better_epoch > early_stop_epochs > 0: break
             if epoch >= self.start_save_model_epochs:
                 if (epoch - self.start_save_model_epochs) % 10 == 0:
-                    model_path = os.path.join(model_dir, f'{epoch}_checkpoint.pth_{snr}.tar')
+                    model_path = os.path.join(model_dir, f'{epoch}_checkpoint.pth.tar')
                     save_model_state_dict(model_path, epoch=epoch,
                                                 model=self.model,
                                                 optimizer=None)
@@ -84,8 +82,7 @@ class Trainer:
 
     def val(self, epoch=None, save=True):
         csv_lines = []
-        snr = self.snr
-        result_dir = f"./result/{snr}"
+        result_dir = f"./result/DCASE"
         os.makedirs(result_dir, exist_ok=True)
         self.model.eval()
         model = self.model
@@ -100,6 +97,7 @@ class Trainer:
             for modelID in machine_id_list:
                 meta = machinetype + '-' + modelID
                 label = self.meta2label_dic[meta]
+                # print(target_dir)
                 val_files, y_true = create_val_file_list(target_dir, modelID, dir_name='val')
                 csv_path = os.path.join(result_dir, f'anomaly_score_{machinetype}_{modelID}.csv')
                 anomaly_score_list = []
@@ -128,6 +126,7 @@ class Trainer:
                 performance.append([auc, pauc])
         
             avg_performance = np.mean(np.array(performance, dtype=float), axis=0)
+            # print(avg_performance)
             mean_auc, mean_pauc = avg_performance[0], avg_performance[1]
             print(f"{machinetype}\t\tAUC: {mean_auc*100:.3f}\tpAUC: {mean_pauc*100:.3f}")
             csv_lines.append(['Average'] + list(avg_performance))
@@ -150,8 +149,7 @@ class Trainer:
         return avg_auc, avg_pauc
     
     def test(self):
-        snr = self.snr
-        result_dir =f'./result/{snr}/test'
+        result_dir =f'./result/DCASE/test'
         os.makedirs(result_dir, exist_ok=True)
 
         self.model.eval()

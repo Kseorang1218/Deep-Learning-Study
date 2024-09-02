@@ -6,7 +6,7 @@ import torch
 
 class STgramMFN(nn.Module):
     def __init__(self, num_class, n_mels=128, win_length=1024, hop_length=512,
-                 m=0.5, s=30, sub=1, use_arcface=False):
+                 m=0.7, s=30, sub=1, use_arcface=False):
         super(STgramMFN, self).__init__()
         self.arcface = ArcMarginProduct(in_features=128, out_features=num_class,
                                         m=m, s=s, sub=sub) if use_arcface else use_arcface
@@ -29,7 +29,7 @@ class TgramNet(nn.Module):
         super(TgramNet, self).__init__()
 
         # LayerNorm 사용했으므로 bias=False
-        self.large_kernel = nn.Conv1d(1, n_mels, win_length, hop_length, win_length//2, bias=False)
+        self.conv_extrctor = nn.Conv1d(1, n_mels, win_length, hop_length, win_length//2, bias=False)
         self.conv_blocks = nn.Sequential(
             nn.LayerNorm(313),
             nn.LeakyReLU(),
@@ -45,7 +45,7 @@ class TgramNet(nn.Module):
         )
 
     def forward(self, x):
-        out = self.large_kernel(x)
+        out = self.conv_extrctor(x)
         out = self.conv_blocks(out)
 
         return out

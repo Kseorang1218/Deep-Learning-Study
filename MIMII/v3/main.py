@@ -11,13 +11,13 @@ import torch
 
 from torch.utils.data import DataLoader
 
-config = load_yaml('./config.yaml')
+config = load_yaml('./config_v3.yaml')
 
 set_seed(config.seed)
 
-train_dirs = [os.path.join(config.data_dir, config.snr, train_dir) for train_dir in config.train_dirs]
-val_dirs = [os.path.join(config.data_dir, config.snr, val_dir) for val_dir in config.val_dirs]
-test_dirs = [os.path.join(config.data_dir, config.snr, test_dir) for test_dir in config.test_dirs]
+train_dirs = config.train_dirs
+val_dirs =  config.val_dirs
+test_dirs = config.test_dirs
 
 if torch.cuda.is_available():
     device = torch.device('cuda')
@@ -54,13 +54,14 @@ else:
 
 
 
-download_mimii(config.data_dir, config.snr)
-split_dirs(config.data_dir,config.snr)
+# download_mimii(config.data_dir, config.snr)
+# split_dirs(config.data_dir,config.snr)
 
 train_file_list = []
 for train_dir in train_dirs:
     train_file_list.extend(get_filename_list(train_dir))
 
+# print(train_file_list)
 meta2label_dic, label2meta_dic = metadata_to_label(train_dirs)
 print(label2meta_dic)
 
@@ -76,10 +77,10 @@ loss = CrossEntropyLoss()
 
 trainer = Trainer(model=model, epoch=config.epoch, device=device, criterion=loss,optimizer=optimizer,
                   start_valid_epoch=0, valid_interval=config.valid_interval, train_dirs=train_dirs, valid_dirs=val_dirs, test_dirs=test_dirs,
-                  meta2label_dic=meta2label_dic, transform=train_dataset.transform, snr=config.snr)
+                  meta2label_dic=meta2label_dic, transform=train_dataset.transform)
 
-trainer.train(train_loader=train_dataloader)
-model_path = os.path.join(f"./model/{config.snr}", f'{config.load_epoch}_checkpoint_{config.snr}.pth.tar')
+# trainer.train(train_loader=train_dataloader)
+model_path = os.path.join(f"./model/DCASE", f'{config.load_epoch}_checkpoint.pth.tar')
 state_dict = torch.load(model_path, map_location=device, weights_only=True)['model']
 trainer.model.load_state_dict(state_dict)
 

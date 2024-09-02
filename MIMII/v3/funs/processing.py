@@ -2,7 +2,7 @@
 import torchaudio
 
 class melspectogram(object):
-    def __init__(self, sampling_rate=16000, n_fft=2048, hop_length=512, win_length=1024, n_mels=128, power=2.0):
+    def __init__(self, sampling_rate=16000, n_fft=1024, hop_length=512, win_length=1024, n_mels=128, power=2.0):
         self.mel_spec = torchaudio.transforms.MelSpectrogram(
             sample_rate=sampling_rate,
             win_length=win_length,
@@ -13,4 +13,4 @@ class melspectogram(object):
         self.amplitude_to_db = torchaudio.transforms.AmplitudeToDB(stype='power')
 
     def __call__(self, x):
-        return self.mel_spec(self.amplitude_to_db(x))
+        return self.amplitude_to_db(self.mel_spec(x))

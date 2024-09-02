@@ -4,4 +4,3 @@ dataset/
 __pycache__
 model/
 log/
-*.ipynb
