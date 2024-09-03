@@ -79,7 +79,7 @@ trainer = Trainer(model=model, epoch=config.epoch, device=device, criterion=loss
                   start_valid_epoch=0, valid_interval=config.valid_interval, train_dirs=train_dirs, valid_dirs=val_dirs, test_dirs=test_dirs,
                   meta2label_dic=meta2label_dic, transform=train_dataset.transform)
 
-# trainer.train(train_loader=train_dataloader)
+trainer.train(train_loader=train_dataloader)
 model_path = os.path.join(f"./model/DCASE", f'{config.load_epoch}_checkpoint.pth.tar')
 state_dict = torch.load(model_path, map_location=device, weights_only=True)['model']
 trainer.model.load_state_dict(state_dict)

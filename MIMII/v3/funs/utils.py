@@ -107,6 +107,26 @@ def create_val_file_list(target_dir,
     labels = np.concatenate((normal_labels, anomaly_labels), axis=0)
     return files, labels
 
+
+def create_train_file_list(target_dir,
+                          id_name,
+                          dir_name='train',
+                          prefix_normal='normal',
+                          prefix_anomaly='abnormal',
+                          ext='wav'):
+    normal_files_path = f'{target_dir}/{prefix_normal}_{id_name}*.{ext}'
+    normal_files = sorted(glob.glob(normal_files_path))
+    normal_labels = np.zeros(len(normal_files))
+
+    anomaly_files_path = f'{target_dir}/{prefix_anomaly}_{id_name}*.{ext}'
+    anomaly_files = sorted(glob.glob(anomaly_files_path))
+    anomaly_labels = np.ones(len(anomaly_files))
+
+    files = np.concatenate((normal_files, anomaly_files), axis=0)
+    labels = np.concatenate((normal_labels, anomaly_labels), axis=0)
+    return files, labels
+
+
 def save_model_state_dict(file_path, epoch=None, model=None, optimizer=None):
     import torch
     state_dict = {

@@ -28,7 +28,9 @@ class Trainer:
 
     def train(self, train_loader):
         model_dir = f"./model/DCASE"
+        result_dir = f'./result/DCASE/train'
         os.makedirs(model_dir, exist_ok=True)
+        os.makedirs(result_dir, exist_ok=True)
         best_metric = 0
         early_stop_epochs = self.early_stop_epochs
         start_valid_epoch = self.start_valid_epoch
@@ -36,6 +38,7 @@ class Trainer:
         epoch = self.epoch
         num_steps = len(train_loader)
         no_better_epoch = 0
+        anomaly_score_list = []
         for epoch in range(0, epoch + 1):
             self.model.train()
             train_loss = 0
@@ -54,9 +57,12 @@ class Trainer:
                 self.optimizer.step()
 
                 train_loss += loss.item()
+
+
             avg_train_loss = train_loss / num_steps
             print(f"\n[EPOCH: {epoch}] \tTrain Loss: {avg_train_loss:.4f}")
 
+        
             # val
             if (epoch - start_valid_epoch) % valid_interval == 0 and epoch >= start_valid_epoch:
                 avg_auc, avg_pauc = self.val(epoch, save=False)
@@ -78,6 +84,36 @@ class Trainer:
                     save_model_state_dict(model_path, epoch=epoch,
                                                 model=self.model,
                                                 optimizer=None)
+                    
+        for _, (target_dir, train_dir) in enumerate(zip(sorted(self.train_dirs), sorted(self.train_dirs))):
+                machine_id_list = get_machine_id_list(target_dir)
+                machinetype = target_dir.split("/")[-2]
+                
+                # print(machinetype)
+                for modelID in machine_id_list:
+                    meta = machinetype + '-' + modelID
+                    label = self.meta2label_dic[meta]
+                    # print(target_dir)
+                    train_files, y_true = create_train_file_list(target_dir, modelID, dir_name='train')
+                    csv_path = os.path.join(result_dir, f'anomaly_score_{machinetype}_{modelID}.csv')
+                    anomaly_score_list = []
+                    # print("y_true", y_true)
+                    y_pred = [0. for _ in train_files]
+
+                    for file_idx, file_path in enumerate(train_files):
+                        x_wav, x_mel, label = self.transform(file_path)
+                        x_wav, x_mel = x_wav.unsqueeze(0).float().to(self.device), x_mel.unsqueeze(0).float().to(self.device)
+                        label = torch.tensor([label]).long().to(self.device)
+
+                        with torch.no_grad():
+                            predict_ids, feature = self.model(x_wav, x_mel, label)
+                        # print(predict_ids)
+                        probs = - torch.log_softmax(predict_ids, dim=1).mean(dim=0).squeeze().cpu().numpy()
+                        y_pred[file_idx] = probs[label]
+                        anomaly_score_list.append([os.path.basename(file_path), y_pred[file_idx]])
+                    # print('train csv saved')
+                    save_csv(csv_path, anomaly_score_list)
+
                     
 
     def val(self, epoch=None, save=True):
@@ -113,7 +149,8 @@ class Trainer:
                         predict_ids, feature = model(x_wav, x_mel, label)
                         # print(predict_ids)
                     probs = - torch.log_softmax(predict_ids, dim=1).mean(dim=0).squeeze().cpu().numpy()
-                    # print(probs)
+                    # print(label)
+                    # print(probs[label])
                     y_pred[file_idx] = probs[label]
                     anomaly_score_list.append([os.path.basename(file_path), y_pred[file_idx]])
                 if save:
@@ -145,6 +182,7 @@ class Trainer:
         print(f'Total average:\t\tAUC: {avg_auc*100:.3f}\tpAUC: {avg_pauc*100:.3f}')
         result_path = os.path.join(result_dir, 'result.csv')
         if save:
+            # print('val csv saved')
             save_csv(result_path, csv_lines)
         return avg_auc, avg_pauc
     
@@ -177,4 +215,5 @@ class Trainer:
                     y_pred[file_idx] = probs[label]
                     # print(y_pred)
                     anomaly_score_list.append([os.path.basename(file_path), y_pred[file_idx]])
+                # print('test csv saved')
                 save_csv(csv_path, anomaly_score_list)
