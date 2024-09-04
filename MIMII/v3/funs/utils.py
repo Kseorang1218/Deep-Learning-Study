@@ -93,7 +93,7 @@ def create_val_file_list(target_dir,
                           id_name,
                           dir_name='val',
                           prefix_normal='normal',
-                          prefix_anomaly='abnormal',
+                          prefix_anomaly='anomaly',
                           ext='wav'):
     normal_files_path = f'{target_dir}/{prefix_normal}_{id_name}*.{ext}'
     normal_files = sorted(glob.glob(normal_files_path))
@@ -112,7 +112,7 @@ def create_train_file_list(target_dir,
                           id_name,
                           dir_name='train',
                           prefix_normal='normal',
-                          prefix_anomaly='abnormal',
+                          prefix_anomaly='anomaly',
                           ext='wav'):
     normal_files_path = f'{target_dir}/{prefix_normal}_{id_name}*.{ext}'
     normal_files = sorted(glob.glob(normal_files_path))

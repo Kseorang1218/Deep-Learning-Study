@@ -1,31 +1,31 @@
 seed: 42
 
 data_dir: './data'
-snr: '6_dB'
+snr: '0_dB'
 
 train_dirs:
-  - './data/-6_dB/fan/train'
-  - './data/-6_dB/pump/train'
-  - './data/-6_dB/slider/train'
-  - './data/-6_dB/valve/train'
+  - '../STgram-MFN/data/dataset/fan/train'
+  - '../STgram-MFN/data/dataset/pump/train'
+  - '../STgram-MFN/data/dataset/slider/train'
+  - '../STgram-MFN/data/dataset/valve/train'
 
-# add_dirs:
-#   - './data/-6_dB/test/fan/train'
-#   - './data/-6_dB/test/pump/train'
-#   - './data/-6_dB/test/slider/train'
-#   - './data/-6_dB/test/valve/train'
+add_dirs:
+  - '../STgram-MFN/data/eval_dataset/fan/train'
+  - '../STgram-MFN/data/eval_dataset/pump/train'
+  - '../STgram-MFN/data/eval_dataset/slider/train'
+  - '../STgram-MFN/data/eval_dataset/valve/train'
 
 val_dirs:
-  - './data/-6_dB/fan/val'
-  - './data/-6_dB/pump/val'
-  - './data/-6_dB/slider/val'
-  - './data/-6_dB/valve/val'
+  - '../STgram-MFN/data/dataset/fan/test'
+  - '../STgram-MFN/data/dataset/pump/test'
+  - '../STgram-MFN/data/dataset/slider/test'
+  - '../STgram-MFN/data/dataset/valve/test'
 
 test_dirs:
-  - './data/-6_dB/fan/test'
-  - './data/-6_dB/pump/test'
-  - './data/-6_dB/slider/test'
-  - './data/-6_dB/valve/test'
+  - '../STgram-MFN/data/eval_dataset/fan/test'
+  - '../STgram-MFN/data/eval_dataset/pump/test'
+  - '../STgram-MFN/data/eval_dataset/slider/test'
+  - '../STgram-MFN/data/eval_dataset/valve/test'
 
 batch_size: 64
 

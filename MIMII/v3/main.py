@@ -15,10 +15,11 @@ config = load_yaml('./config_v3.yaml')
 
 set_seed(config.seed)
 
-train_dirs = config.train_dirs
+train_dirs = config.train_dirs + config.add_dirs
 val_dirs =  config.val_dirs
 test_dirs = config.test_dirs
 
+# print(train_dirs)
 if torch.cuda.is_available():
     device = torch.device('cuda')
 else:
