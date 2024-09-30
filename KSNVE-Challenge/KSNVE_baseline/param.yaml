@@ -1,0 +1,23 @@
+data_dir: ../dataset
+train_dir: ./data/train
+eval_dir: ./data/eval
+test_dir: ./data/test
+
+result_dir: ./results
+model_dir: ./model
+
+model_path: baseline.pth
+
+epochs: 30
+batch_size: 32
+lr: 1e-3
+
+gpu: 0
+n_workers: 4
+
+sr: 25600
+n_fft: 1024
+win_length: 1024
+hop_length: 512
+n_mels: 128
+power: 2.0
