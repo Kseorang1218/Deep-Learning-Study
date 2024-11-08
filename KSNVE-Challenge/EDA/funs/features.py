@@ -4,6 +4,7 @@ import numpy as np
 
 def average(data):
     average = np.mean(data)
+
     return average
 
 def rms(data):
@@ -29,3 +30,26 @@ def crest_factor(data):
     crest_factor = peaks/rms
 
     return crest_factor
+
+def shape_factor(data):
+    rms = np.sqrt(np.mean(data**2))
+    abs_avg = np.mean(np.abs(data))
+    shape_factor = rms/abs_avg
+
+    return shape_factor
+
+def skewness(data):
+    avg = np.mean(data)
+    dividend = np.mean(np.power(data-avg, 3))
+    divisor = np.power(np.mean(np.power(data-avg, 2)), 3/2)
+    skew = dividend / divisor
+
+    return skew
+
+def kurtsis(data):
+    avg = np.mean(data)
+    dividend = np.mean(np.power(data-avg, 4))
+    divisor = np.power(np.mean(np.power(data-avg, 2)), 2)
+    kurt = dividend / divisor
+    
+    return kurt
