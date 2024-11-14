@@ -39,7 +39,6 @@ def make_dataframe(directory: str) -> pd.DataFrame:
         'ball'  : 1,
         'inner' : 2,
         'outer' : 3
-
     }
 
     file_list =  os.listdir(directory)
@@ -60,22 +59,28 @@ def make_dataframe(directory: str) -> pd.DataFrame:
 
     return pd.DataFrame(df)
 
-def data_sampling(data: pd.Series, sample_size: int, overlap: int) -> List:
-    """_summary_
+def data_sampling(data: np.ndarray, sample_size: int, overlap: int) -> List:
+    """
+    주어진 sample size, overlap에 따라 데이터를 샘플링하는 함수.
+    예를 들어, data가 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]이고, sample_size=4, overlap=2인 경우,
+    반환되는 리스트는 다음과 같다:
+    [[1, 2, 3, 4], 
+    [3, 4, 5, 6], 
+    [5, 6, 7, 8]]
 
     Parameters
     ----------
-    data : pd.Series
-        _description_
+    data : np.ndarray
+        샘플링하고자 하는 데이터
     sample_size : int
-        _description_
+        데이터 샘플 크기
     overlap : int
-        _description_
+        overlap 길이
 
     Returns
     -------
     List
-        _description_
+        주어진 규칙에 따라 나뉜 세그먼트들의 리스트. 각 세그먼트는 sample_size 길이의 np.ndarray 형태를 가진다.
     """
     data_list = []
     for i in range(0, len(data)-sample_size, overlap):
@@ -87,21 +92,22 @@ def data_sampling(data: pd.Series, sample_size: int, overlap: int) -> List:
 def get_data_label_arrays(
         df: pd.DataFrame, sample_size: int, overlap: int
         )-> Tuple[np.ndarray, np.ndarray]:
-    """_summary_
+    """
+    데이터를 샘플링하며 (데이터, 라벨) 튜플로 반환하는 함수
 
     Parameters
     ----------
     df : pd.DataFrame
-        _description_
+        샘플링하고자 하는 데이터프레임
     sample_size : int
-        _description_
+        데이터 샘플 크기
     overlap : int
-        _description_
+        overlap 길이
 
     Returns
     -------
     Tuple[np.ndarray, np.ndarray]
-        _description_
+        (데이터, 라벨) 튜플
     """
     data = []
     labels = []
@@ -123,6 +129,6 @@ if __name__=='__main__':
     df = make_dataframe(directory)
     print(df,'\n')
 
-    train_data, train_label = get_data_label_arrays(df, 4096, 2048)
+    train_data, train_label = get_data_label_arrays(df, 2048, 1024)
     print('train data shape:', train_data.shape)
     print('train label shape:', train_label.shape)

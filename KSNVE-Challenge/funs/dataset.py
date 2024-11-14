@@ -1,16 +1,21 @@
 # dataset.py
 
 import torch
-from torch.utils.data import Dataset
+import torch.utils
+from torch.utils.data import Dataset, DataLoader
 
 class KSNVEDataset(Dataset):
-    def __init__(self, data, label, transform = None): 
+    def __init__(self, data, label): 
         self.data = data
         self.label = label
-        self.transform = transform
 
     def __getitem__(self, index):
-        return torch.Tensor(self.data[index]), torch.Tensor(self.label[index])
+        data = torch.tensor(self.data[index])
+        label = torch.tensor(self.label[index])
+        return data, label
     
     def __len__(self):
         return self.data.shape[0]
+    
+def get_dataloader(dataset: Dataset, batch_size: int, shuffle: bool = False) -> DataLoader:
+    return DataLoader(dataset, batch_size, shuffle)
