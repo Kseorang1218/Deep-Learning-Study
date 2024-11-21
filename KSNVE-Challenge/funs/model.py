@@ -3,52 +3,38 @@
 import torch.nn as nn
 
 class AutoEncoder(nn.Module):
-    def __init__(self, in_channels):
+    def __init__(self, in_channels:int = 2):
         super(AutoEncoder, self).__init__()
 
         self.in_channels = in_channels
         
-        self.flatten = nn.Flatten()
-
         self.encoder = nn.Sequential(
-            nn.Linear(2*in_channels, 1024),
+            nn.Linear(in_channels, 2048),
+            nn.ReLU(),
+            nn.Linear(2048, 1024),
             nn.ReLU(),
             nn.Linear(1024, 512),
             nn.ReLU(),
             nn.Linear(512, 256),
             nn.ReLU(),
-            nn.Linear(256, 64),
-            nn.ReLU(),
-            nn.Linear(64, 16),
-            nn.ReLU(),
-            nn.Linear(16, 8),
-            nn.ReLU(),
-            nn.Linear(8, 4),
+            nn.Linear(256, 128),
         )
 
         self.decoder = nn.Sequential(
-            nn.Linear(4, 8),
-            nn.ReLU(),
-            nn.Linear(8, 16),
-            nn.ReLU(),
-            nn.Linear(16, 64),
-            nn.ReLU(),
-            nn.Linear(64, 256),
+            nn.Linear(128, 256),
             nn.ReLU(),
             nn.Linear(256, 512),
             nn.ReLU(),
             nn.Linear(512, 1024),
             nn.ReLU(),
-            nn.Linear(1024, 2*in_channels), 
-            nn.Sigmoid()  
+            nn.Linear(1024, 2048), 
+            nn.ReLU(),
+            nn.Linear(2048, in_channels), 
         )
 
     def forward(self, x):
-        out = self.flatten(x)
-
-        out = self.encoder(out)
+        out = self.encoder(x)
         out = self.decoder(out)
-        out = out.reshape((-1, 2, self.in_channels))
 
         return out
 
