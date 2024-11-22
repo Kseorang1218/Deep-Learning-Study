@@ -129,6 +129,6 @@ if __name__=='__main__':
     df = make_dataframe(directory)
     print(df,'\n')
 
-    train_data, train_label = get_data_label_arrays(df, 2048, 1024)
+    train_data, train_label = get_data_label_arrays(df, 4096, 2048)
     print('train data shape:', train_data.shape)
     print('train label shape:', train_label.shape)

@@ -7,4 +7,5 @@ seed: 42
 sample_size: 4096
 overlap: 2048
 
-batch_size: 32
+batch_size: 64
+learning_rate: 0.001
