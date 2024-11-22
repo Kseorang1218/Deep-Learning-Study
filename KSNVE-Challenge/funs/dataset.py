@@ -34,7 +34,7 @@ if __name__=='__main__':
     # print('Data example:', data)  
     # print('Label example:', label) 
 
-    print('Data shape from dataset:', data.shape)
+    print('\nData shape from dataset:', data.shape)
     print('Label shape from dataset:', label.shape)
 
     dataloader = get_dataloader(dataset, 64, True)
@@ -44,4 +44,4 @@ if __name__=='__main__':
     # print('Label example from dataloaders:', dataloader_label) 
 
     print(f"\nData shape from dataloader: {dataloader_data.size()}")
-    print(f"Labels shape from dataloader: {dataloader_label.size()}")
+    print(f"Label shape from dataloader: {dataloader_label.size()}\n")

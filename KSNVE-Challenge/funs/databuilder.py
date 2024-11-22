@@ -127,8 +127,8 @@ def get_data_label_arrays(
 if __name__=='__main__':
     directory = '../dataset/train'
     df = make_dataframe(directory)
-    print(df,'\n')
+    print('\n', df, '\n')
 
     train_data, train_label = get_data_label_arrays(df, 4096, 2048)
     print('train data shape:', train_data.shape)
-    print('train label shape:', train_label.shape)
+    print('train label shape:', train_label.shape, '\n')
