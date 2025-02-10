@@ -11,4 +11,4 @@ overlap: 2048
 
 batch_size: 128
 learning_rate: 0.001
-epoch: 5
+epoch: 3

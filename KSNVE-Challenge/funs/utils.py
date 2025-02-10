@@ -8,6 +8,8 @@ import random
 
 import torch
 
+import argparse
+
 def load_yaml(config_path: str) -> Box:
     """
     YAML 파일을 load하는 함수
@@ -42,3 +44,7 @@ def set_seed(seed: int):
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="KSNVE challenge")
+    return parser.parse_args()
