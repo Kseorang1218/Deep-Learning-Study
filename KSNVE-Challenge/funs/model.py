@@ -1,43 +1,55 @@
 # model.py
 
 import torch.nn as nn
-
 import torch
 
+from typing import List
+
+class LinearBlock(nn.Module):
+    def __init__(self, in_features, out_features):
+        super(LinearBlock, self).__init__()
+
+        self.linear = nn.Linear(in_features, out_features)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        out = self.relu(self.linear(x))
+        return out
+
+
 class AutoEncoder(nn.Module):
-    def __init__(self, in_channels:int = 2, input_size:int = 4096):
+    def __init__(self, block, layer_size_list: List, in_channels:int = 2, input_size:int = 4096):
         super(AutoEncoder, self).__init__()
 
         self.in_channels = in_channels
         self.input_size = input_size
-        
-        self.encoder = nn.Sequential(
-            nn.Linear(in_channels * input_size, 4096),
-            nn.ReLU(),
-            nn.Linear(4096, 2048),
-            nn.ReLU(),
-            nn.Linear(2048, 1024),
-            nn.ReLU(),
-            nn.Linear(1024, 512),
-        )
 
-        self.decoder = nn.Sequential(
-            nn.Linear(512, 1024),
-            nn.ReLU(),
-            nn.Linear(1024, 2048), 
-            nn.ReLU(),
-            nn.Linear(2048, 4096), 
-            nn.ReLU(),
-            nn.Linear(4096, in_channels * input_size), 
-        )
+        encoder_layers = []
+        prev_size = in_channels * self.input_size   # prev_size = 2*4096
+        for size in layer_size_list:
+            encoder_layers.append(block(prev_size, size))
+            prev_size = size
+        self.encoder = nn.Sequential(*encoder_layers)
+
+        decoder_layers = []
+        layer_size_list.reverse()
+        for size in layer_size_list[1:]:    # 첫번째 값은 제외
+            decoder_layers.append(block(prev_size, size))
+            prev_size = size
+        decoder_layers.append(block(prev_size, in_channels * self.input_size))  # 원본 인코더 입력과 같은 크기로 맞춤
+        self.decoder = nn.Sequential(*decoder_layers)
 
 
     def forward(self, x):
         x = x.reshape(x.size(0), -1)
         out = self.encoder(x)
+
+        latent_vector = out
+        
         out = self.decoder(out)
         out = out.reshape(-1, self.in_channels, self.input_size)
-        return out
+    
+        return out, latent_vector
 
 
 if __name__=='__main__':
@@ -45,7 +57,9 @@ if __name__=='__main__':
 
     x = torch.randn(64, 2, 4096).to(device)
     print('\nData input shape:',x.shape)
-    model = AutoEncoder(in_channels=2, input_size=4096).to(device)
+
+    layer_size_list = [4096, 2048, 1024, 512]
+    model = AutoEncoder(LinearBlock, layer_size_list, in_channels=2, input_size=4096).to(device)
     # print('\nmodel:', model)
 
     x_input = x.reshape(x.size(0), -1)
