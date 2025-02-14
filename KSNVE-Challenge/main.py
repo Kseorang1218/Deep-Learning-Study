@@ -25,7 +25,9 @@ def main(config):
     train_loader = funs.get_dataloader(train_dataset, config.batch_size, shuffle = True)
     eval_loader = funs.get_dataloader(eval_dataset, 1, shuffle = False)
 
-    model = funs.AutoEncoder(in_channels=2, input_size=config.sample_size).to(device)
+    layer_size_list = [4096, 2048, 1024, 512]
+    model = funs.AutoEncoder(funs.LinearBlock, layer_size_list, in_channels = 2, input_size = config.sample_size).to(device)
+
     optimizer = Adam(model.parameters(), lr = config.learning_rate)
     loss = torch.nn.MSELoss()
 
