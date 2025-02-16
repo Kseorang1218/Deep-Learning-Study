@@ -4,6 +4,8 @@ test_dir: './dataset/test'
 
 model_root: './model'
 
+tsne_root: './latent_figs'
+
 seed: 42
 
 sample_size: 4096
@@ -11,4 +13,4 @@ overlap: 2048
 
 batch_size: 128
 learning_rate: 0.001
-epoch: 9
+epoch: 100

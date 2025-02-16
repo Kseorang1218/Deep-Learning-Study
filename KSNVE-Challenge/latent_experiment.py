@@ -1,12 +1,16 @@
 # main.py
 
 import funs
+import latent
 
 from torch.optim import Adam
 import torch
 
 
 def main(config, layer_size_list):
+    latent_size = layer_size_list[-1]
+    print(f'\nLatent space size: {latent_size}')
+
     funs.set_seed(config.seed)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -31,13 +35,24 @@ def main(config, layer_size_list):
 
     trainer = funs.Trainer(model, loss, optimizer, device)
     trainer.train(config.epoch, train_loader)
-    trainer.save(config.model_root)
+    trainer.save(config.model_root, latent_size=latent_size)
 
-    model_path = f'{config.model_root}/model.pt'
+    model_path = f'{config.model_root}/model_{latent_size}.pt'
     trainer.model.load_state_dict(torch.load(model_path, weights_only=True))
 
-    trainer.eval(eval_loader) 
+    latent_vectors, fault_labels = trainer.eval(eval_loader) 
+    # 2d tnse
+    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+                     config.seed, n_components=2, except_IR=False)
+    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+                     config.seed, n_components=2, except_IR=True)
+    # 3d tnse
+    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+                     config.seed, n_components=3, except_IR=False)
+    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+                     config.seed, n_components=3, except_IR=True)
 
+   
 if __name__ == '__main__' :
     args = funs.parse_arguments()
     config = funs.load_yaml('./config.yaml')
