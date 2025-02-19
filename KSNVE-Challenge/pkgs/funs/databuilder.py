@@ -116,14 +116,12 @@ def get_data_label_arrays(
         xdata = data_sampling(row['xdata'], sample_size, overlap)
         ydata = data_sampling(row['ydata'], sample_size, overlap)
         label = row['label']
-
+        
         for x_seg, y_seg in zip(xdata, ydata):
-            combined_seg = np.concatenate([x_seg, y_seg])  # (2 * sample_size,)
-            data.append(combined_seg)
+            data.append((x_seg, y_seg))
             labels.append(label)
 
     return np.array(data), np.array(labels)
-
 
 
 if __name__=='__main__':
