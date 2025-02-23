@@ -8,7 +8,7 @@ import torch
 
 
 def main(config, layer_size_list):
-    latent_size = layer_size_list[-1]
+    latent_size = 'wdcnn_ae'
     print(f'\nLatent space size: {latent_size}')
 
     funs.set_seed(config.seed)
@@ -28,7 +28,7 @@ def main(config, layer_size_list):
     train_loader = funs.get_dataloader(train_dataset, config.batch_size, shuffle = True)
     eval_loader = funs.get_dataloader(eval_dataset, 1, shuffle = False)
 
-    model = funs.AutoEncoder(funs.LinearBlock, layer_size_list, in_channels = 2, input_size = config.sample_size).to(device)
+    model = latent.WDCNN_AE().to(device)
 
     optimizer = Adam(model.parameters(), lr = config.learning_rate)
     loss = torch.nn.MSELoss()
