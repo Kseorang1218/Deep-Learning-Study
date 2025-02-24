@@ -9,7 +9,7 @@ import os
 import numpy as np
 
 
-def plot_tsne(root, latent_vectors, fault_label_list, latent_size, seed=42, n_components=2, except_IR=True):
+def plot_tsne(root, latent_vectors, fault_label_list, latent_size, seed=42, n_components=2, model_name=None, except_IR=True):
     fault_label_list = np.array(fault_label_list, dtype=int)
     latent_vectors = np.array(latent_vectors)  # numpy 배열 변환
     
@@ -60,7 +60,10 @@ def plot_tsne(root, latent_vectors, fault_label_list, latent_size, seed=42, n_co
         plt.legend(title="Class Labels")
     
     save_path = os.path.join(root, f"{n_components}D")
-    fig_title = f"t-SNE_{latent_size}"
+    fig_title = f"t-SNE"
+    if model_name:
+        fig_title += f'_{model_name}'
+    fig_title += f"_{latent_size}"
     if except_IR:
         fig_title += "_noIR"
     
@@ -68,7 +71,8 @@ def plot_tsne(root, latent_vectors, fault_label_list, latent_size, seed=42, n_co
     plt.savefig(f"{save_path}/{fig_title}.png")
     plt.close()
 
-def plot_umap(root, latent_vectors, latent_size, seed=42, except_IR=True):
+
+def plot_umap(root, latent_vectors, latent_size, seed=42, model_name=None, except_IR=True):
     latent_vectors = np.array(latent_vectors)
     fault_types = ["normal", "ball", "inner", "outer"]
 
@@ -81,9 +85,13 @@ def plot_umap(root, latent_vectors, latent_size, seed=42, except_IR=True):
     plt.title('UMAP projection of the Digits dataset', fontsize=24)
 
     save_path = os.path.join(root, 'umap')
-    fig_title = f"UMAP_{latent_size}"
+    fig_title = f"UMAP"
+    if model_name:
+        fig_title += f'_{model_name}'
+    fig_title += f"_{latent_size}"
     if except_IR:
         fig_title += "_noIR"
+    
     
     os.makedirs(save_path, exist_ok=True)
     plt.savefig(f"{save_path}/{fig_title}.png")

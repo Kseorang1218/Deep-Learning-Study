@@ -1,98 +1,121 @@
 import torch
 import torch.nn as nn
 
+class Conv1dBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, padding):
+        super(Conv1dBlock, self).__init__()
+        self.conv1d = nn.Conv1d(in_channels, out_channels, kernel_size, stride, padding)
+        self.batchnorm1d = nn.BatchNorm1d(out_channels)
+        self.relu = nn.ReLU()
+        self.maxpool1d = nn.MaxPool1d(2,2)
+
+    def forward(self, x):
+        out = self.conv1d(x)
+        out = self.batchnorm1d(out)
+        out = self.relu(out)
+        out = self.maxpool1d(out)
+        return out
+
+
+class Upsample1dBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, padding):
+        super(Upsample1dBlock, self).__init__()
+        self.upsample = nn.Upsample(scale_factor=2, mode='linear')
+        self.convtranspose1d = nn.ConvTranspose1d(in_channels, out_channels, kernel_size, stride, padding)
+        self.batchnorm1d = nn.BatchNorm1d(out_channels)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        out = self.upsample(x)
+        out = self.convtranspose1d(out)
+        out = self.batchnorm1d(out)
+        out = self.relu(out)
+        return out
+
+
 class WDCNN_AE(nn.Module):
-    def __init__(self, first_kernel: int=64) -> None:
+    def __init__(self, encoder_block, decoder_block, latent_space_size, 
+                 first_kernel: int=64, in_channels:int = 2, input_size:int = 4096):
         super(WDCNN_AE, self).__init__()
 
+        self.input_size = input_size
+        self.in_channels = in_channels
+
         # 인코더 부분
-        self.conv_layers = nn.Sequential(
-            # Conv1
-            torch.nn.Conv1d(1, 16, first_kernel, stride=16, padding=24),
-            torch.nn.BatchNorm1d(16),
-            torch.nn.ReLU(),
-            # Pool1
-            torch.nn.MaxPool1d(2, 2),
-            # Conv2
-            torch.nn.Conv1d(16, 32, 3, stride=1, padding=1),
-            torch.nn.BatchNorm1d(32),
-            torch.nn.ReLU(),
-            # Pool2
-            torch.nn.MaxPool1d(2, 2),
-            # Conv3
-            torch.nn.Conv1d(32, 64, 3, stride=1, padding=1),
-            torch.nn.BatchNorm1d(64),
-            torch.nn.ReLU(),
-            # Pool3
-            torch.nn.MaxPool1d(2, 2),
-            # Conv4
-            torch.nn.Conv1d(64, 64, 3, stride=1, padding=1),
-            torch.nn.BatchNorm1d(64),
-            torch.nn.ReLU(),
-            # Pool4
-            torch.nn.MaxPool1d(2, 2),
-            # Conv5
-            torch.nn.Conv1d(64, 64, 3, stride=1, padding=0),
-            torch.nn.BatchNorm1d(64),
-            torch.nn.ReLU(),
-            # Pool5
-            torch.nn.MaxPool1d(2, 2)
+        self.encoder_conv = nn.Sequential(
+            encoder_block(in_channels=1, out_channels=16, kernel_size=first_kernel, stride=16, padding=24),
+            encoder_block(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1),
+            encoder_block(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1),
+            encoder_block(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=1),
+            encoder_block(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=0),
         )
 
-        # Flatten 후 입력 크기 계산
         with torch.no_grad():
-            dummy = torch.rand(1, 1, 4096*2)
-            dummy = self.conv_layers(dummy)
+            dummy = torch.rand(1, 1, input_size*in_channels)
+            dummy = self.encoder_conv(dummy)
             dummy = torch.flatten(dummy, 1)
             lin_input = dummy.shape[1]
 
-        # 인코더의 linear layer
         self.encoder_linear = nn.Sequential(
-            torch.nn.Linear(lin_input, 100),
-            torch.nn.BatchNorm1d(100),
-            torch.nn.ReLU(),
+            nn.Linear(lin_input, latent_space_size),
+            nn.BatchNorm1d(latent_space_size),
+            nn.ReLU(),
         )
 
-        # 디코더 부분
         self.decoder_linear = nn.Sequential(
-            torch.nn.Linear(100, lin_input),
-            torch.nn.ReLU(),
+            nn.Linear(latent_space_size, lin_input),
+            nn.BatchNorm1d(lin_input),
+            nn.ReLU()
         )
 
         self.decoder_conv = nn.Sequential(
-            # ConvTranspose5
-            torch.nn.ConvTranspose1d(64, 64, 3, stride=2),
-            torch.nn.BatchNorm1d(64),
-            torch.nn.ReLU(),
-            # Conv4
-            torch.nn.ConvTranspose1d(64, 64, 3, stride=2, padding=1),
-            torch.nn.BatchNorm1d(64),
-            torch.nn.ReLU(),
-            # Conv3
-            torch.nn.ConvTranspose1d(64, 32, 3, stride=2, padding=1),
-            torch.nn.BatchNorm1d(32),
-            torch.nn.ReLU(),
-            # Conv2
-            torch.nn.ConvTranspose1d(32, 16, 3, stride=2, padding=1),
-            torch.nn.BatchNorm1d(16),
-            torch.nn.ReLU(),
-            # Conv1
-            torch.nn.ConvTranspose1d(16, 1, first_kernel, stride=16, padding=24),
-            torch.nn.BatchNorm1d(1),
+            decoder_block(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=0),
+            decoder_block(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
+            decoder_block(in_channels=64, out_channels=32, kernel_size=1, stride=1, padding=0),
+            decoder_block(in_channels=32, out_channels=16, kernel_size=1, stride=1, padding=0),
+            nn.Upsample(scale_factor=2, mode='linear')
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # 인코더: 입력을 압축
-        x = x.unsqueeze(1)
-        x = self.conv_layers(x)
-        x = torch.flatten(x, 1)
-        x = self.encoder_linear(x)
+        out = x.reshape(x.size(0), 1, -1)   # [batch_size, in_channels, input_size] -> [batch_size, 1, input_size*in_channels]
 
-        latent_vector = x
+        out = self.encoder_conv(out)
 
-        # 디코더: 압축된 정보를 복원
-        x_reconstructed = self.decoder_linear(x)
-        x_reconstructed = x_reconstructed.view(x_reconstructed.size(0), 64, -1)  # 디코더 입력 형태로 변형
-        x_reconstructed = self.decoder_conv(x_reconstructed)
+        out = torch.flatten(out, 1)     # [batch_size, 960]
+        out = self.encoder_linear(out)  # [batch_size, latent_space_size]
 
-        return x_reconstructed, latent_vector
+        latent_vector = out
+
+        out = self.decoder_linear(out)  # [batch_size, 960]
+
+        out = out.view(out.shape[0], 64, -1) # [batch_size, 64, 15]
+        out = self.decoder_conv(out)      
+
+        out = out.reshape(out.size(0), self.in_channels, -1)   # [batch_size, 16, latent_space_size] -> [batch_size, in_channels, input_size]
+    
+        return out, latent_vector
+
+
+if __name__=='__main__':
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    batch_size = 128
+    x = torch.randn(batch_size, 2, 4096).to(device)
+    print('\nData input shape:',x.shape)
+
+    latent_space_size = 2048
+    model = WDCNN_AE(Conv1dBlock, Upsample1dBlock, latent_space_size).to(device)
+    # print('\nmodel:', model)
+
+    x_input = x.reshape(x.size(0), 1, -1)
+    print('Model input shape:', x_input.shape)
+
+    encoded = model.encoder_conv(x_input)
+    encoded = torch.flatten(encoded, 1)
+    encoded = model.encoder_linear(encoded)
+    print('Encoded output size:', encoded.size())
+
+    decoded = model.decoder_linear(encoded)
+    decoded = decoded.view(batch_size, 64, -1)
+    decoded = model.decoder_conv(decoded)
+    decoded =  decoded.reshape(decoded.size(0), 2, -1)
+    print('Data output shape:', decoded.shape,'\n')

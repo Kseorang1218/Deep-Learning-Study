@@ -50,11 +50,18 @@ def parse_arguments():
     
     # latent space 인자
     parser.add_argument(
-        "--latent", 
+        "--latent_size_list", 
         type=int, 
         nargs="+", 
         default=[4096, 2048, 1024, 512],
-        help="latent space 입력 (예: --latent 4096 2048 1024 512, 기본값: [4096, 2048, 1024, 512])"
+        help="latent space 입력 (예: --latent_size_list 4096 2048 1024 512, 기본값: [4096, 2048, 1024, 512])"
+    )
+        
+    parser.add_argument(
+        "--latent_size",
+        type=int,
+        default=512,
+        help="단일 latent space 크기 (예: --latent_size 512, 기본값: 512)"
     )
         
     args = parser.parse_args()

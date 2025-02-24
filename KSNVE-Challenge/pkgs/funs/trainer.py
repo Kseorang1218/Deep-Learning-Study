@@ -104,12 +104,12 @@ class Trainer:
 
         return auc_dic
 
-    def save(self, root, latent_size = False):
+    def save(self, root, model_name, latent_size = False):
         os.makedirs(f'{root}/', exist_ok=True)
 
         if latent_size:     
             # latent space 실험용         
-            torch.save(self.model.state_dict(), f'{root}/model_{latent_size}.pt')
+            torch.save(self.model.state_dict(), f'{root}/{model_name}_{latent_size}.pt')
         else:
             # 그냥 저장 
-            torch.save(self.model.state_dict(), f'{root}/model.pt')
+            torch.save(self.model.state_dict(), f'{root}/{model_name}.pt')
