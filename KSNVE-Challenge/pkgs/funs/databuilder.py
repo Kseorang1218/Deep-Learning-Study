@@ -59,7 +59,10 @@ def make_dataframe(directory: str) -> pd.DataFrame:
 
     return pd.DataFrame(df)
 
-def data_sampling(data: np.ndarray, sample_size: int, overlap: int) -> List:
+def moving_average(data, window):
+    return pd.Series(data).rolling(window=window, min_periods=1).mean().to_numpy()
+
+def data_sampling(data: np.ndarray, sample_size: int, overlap: int, window: int = 3) -> List:
     """
     주어진 sample size, overlap에 따라 데이터를 샘플링하는 함수.
     예를 들어, data가 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]이고, sample_size=4, overlap=2인 경우,
@@ -85,6 +88,7 @@ def data_sampling(data: np.ndarray, sample_size: int, overlap: int) -> List:
     data_list = []
     for i in range(0, len(data)-sample_size, overlap):
         data_seg = data[i : i + sample_size]
+        data_seg = moving_average(data_seg, window)
         data_list.append(data_seg)
 
     return data_list

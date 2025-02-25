@@ -8,7 +8,7 @@ import torch
 
 
 def main(config, latent_size):
-    model_name = 'wdcnn_ae'
+    model_name = 'wdcnn_ae_2c'
     print(f'\nLatent space size: {latent_size}')
 
     funs.set_seed(config.seed)
@@ -38,24 +38,24 @@ def main(config, latent_size):
     loss = torch.nn.MSELoss()
 
     trainer = funs.Trainer(model, loss, optimizer, device)
-    # trainer.train(config.epoch, train_loader)
-    # trainer.save(config.model_root, model_name=model_name, latent_size=latent_size)
+    trainer.train(config.epoch, train_loader)
+    trainer.save(config.model_root, model_name=model_name, latent_size=latent_size)
 
     model_path = f'{config.model_root}/{model_name}_{latent_size}.pt'
     trainer.model.load_state_dict(torch.load(model_path, weights_only=True))
 
     latent_vectors, fault_labels = trainer.eval(eval_loader, latent_size, config.epoch,
-                                                save_result=True, csv_name='wdcnn_ae_track2', csv_root = config.result_root)
+                                                save_result=True, csv_name='wdcnn_ae_track2_2c', csv_root = config.result_root)
     # 2d tnse
-    # latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
-    #                  config.seed, n_components=2, model_name=model_name, except_IR=False)
-    # latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
-    #                  config.seed, n_components=2, model_name=model_name, except_IR=True)
-    # # 3d tnse
-    # latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
-    #                  config.seed, n_components=3, model_name=model_name, except_IR=False)
-    # latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
-    #                  config.seed, n_components=3, model_name=model_name, except_IR=True)
+    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+                     config.seed, n_components=2, model_name=model_name, except_IR=False)
+    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+                     config.seed, n_components=2, model_name=model_name, except_IR=True)
+    # 3d tnse
+    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+                     config.seed, n_components=3, model_name=model_name, except_IR=False)
+    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+                     config.seed, n_components=3, model_name=model_name, except_IR=True)
 
    
 if __name__ == '__main__' :
