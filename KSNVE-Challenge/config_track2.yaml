@@ -6,6 +6,8 @@ model_root: './model_track2'
 
 tsne_root: './latent_figs/track2'
 
+result_root: './result'
+
 seed: 42
 
 sample_size: 4096

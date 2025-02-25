@@ -6,6 +6,8 @@ model_root: './model'
 
 tsne_root: './latent_figs'
 
+result_root: './result'
+
 seed: 42
 
 sample_size: 4096

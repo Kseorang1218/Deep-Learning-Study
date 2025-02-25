@@ -40,17 +40,18 @@ def main(config, layer_size_list):
     model_path = f'{config.model_root}/model_{latent_size}.pt'
     trainer.model.load_state_dict(torch.load(model_path, weights_only=True))
 
-    latent_vectors, fault_labels = trainer.eval(eval_loader, 'evaluation_results_ae', latent_size) 
+    latent_vectors, fault_labels = trainer.eval(eval_loader, latent_size, config.epoch,
+                                                save_result=True, csv_name='ae', csv_root = config.result_root)
     # 2d tnse
-    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
-                     config.seed, n_components=2, except_IR=False)
-    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
-                     config.seed, n_components=2, except_IR=True)
-    # 3d tnse
-    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
-                     config.seed, n_components=3, except_IR=False)
-    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
-                     config.seed, n_components=3, except_IR=True)
+    # latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+    #                  config.seed, n_components=2, except_IR=False)
+    # latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+    #                  config.seed, n_components=2, except_IR=True)
+    # # 3d tnse
+    # latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+    #                  config.seed, n_components=3, except_IR=False)
+    # latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+    #                  config.seed, n_components=3, except_IR=True)
 
    
 if __name__ == '__main__' :

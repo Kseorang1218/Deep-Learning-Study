@@ -5,6 +5,7 @@ import numpy as np
 import os
 import csv
 
+from datetime import datetime
 from sklearn.metrics import roc_auc_score
 
 class Trainer:
@@ -37,7 +38,7 @@ class Trainer:
 
         return train_loss_list
             
-    def eval(self, eval_loader, csv_name, latent_size):
+    def eval(self, eval_loader, latent_size, epoch, save_result=True, csv_name=None, csv_root=None):
         print("\nStarting Evaluation... \n" + "-" * 40)
         self.model.eval()
         eval_loss_list, auc_dic, latent_vectors, fault_label_list = self.validation_step(eval_loader)
@@ -45,12 +46,10 @@ class Trainer:
         for fault, auc in auc_dic.items():
             print(f'{fault} AUC \t{auc:.5f}')
 
-        with open(f"{csv_name}.csv", mode='a', newline='') as file:
-            writer = csv.writer(file)
-            # 첫 번째 줄에는 헤더를 추가하려면 파일이 비었을 때만 추가
-            writer.writerow(["Fault", "AUC", "Validation Loss", "latent size"])  # CSV 헤더 작성
-            for fault, auc in auc_dic.items():
-                writer.writerow([fault, auc, np.mean(eval_loss_list), latent_size])  # Validation Loss를 각 AUC 항목과 함께 기록
+        if save_result:
+            if csv_name is None or csv_root is None:
+                raise ValueError("Both 'csv_name' and 'csv_root' must be provided when saving the results.")
+            self.save_result(csv_name, csv_root, auc_dic, latent_size, epoch, np.mean(eval_loss_list))
             
         return latent_vectors, fault_label_list
 
@@ -121,3 +120,22 @@ class Trainer:
         else:
             # 그냥 저장 
             torch.save(self.model.state_dict(), f'{root}/{model_name}.pt')
+
+    def save_result(self, csv_name, csv_root, auc_dic, latent_size, epoch, validation_loss):
+        current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+        os.makedirs(f'{csv_root}/', exist_ok=True)
+        csv_file = os.path.join(csv_root, f"{csv_name}.csv")
+
+        write_header = not os.path.exists(csv_file)  # 파일이 없으면 헤더를 작성
+
+        with open(csv_file, mode='a', newline='') as file:
+            writer = csv.writer(file)
+
+            # 첫 번째 줄에 헤더를 추가 (파일이 처음 생성될 때만)
+            if write_header:
+                writer.writerow(["DateTime", "Latent Size", "Epoch", "Fault", "AUC", "Validation Loss"])
+
+            # 각 fault 별로 행 추가
+            for fault, auc in auc_dic.items():
+                writer.writerow([current_datetime, latent_size, epoch, fault, auc, validation_loss])

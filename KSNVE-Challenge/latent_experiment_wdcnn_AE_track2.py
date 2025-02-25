@@ -44,7 +44,8 @@ def main(config, latent_size):
     model_path = f'{config.model_root}/{model_name}_{latent_size}.pt'
     trainer.model.load_state_dict(torch.load(model_path, weights_only=True))
 
-    latent_vectors, fault_labels = trainer.eval(eval_loader, 'evaluation_results_wdcnn_ae_track2', latent_size) 
+    latent_vectors, fault_labels = trainer.eval(eval_loader, latent_size, config.epoch,
+                                                save_result=True, csv_name='wdcnn_ae_track2', csv_root = config.result_root)
     # 2d tnse
     # latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
     #                  config.seed, n_components=2, model_name=model_name, except_IR=False)
