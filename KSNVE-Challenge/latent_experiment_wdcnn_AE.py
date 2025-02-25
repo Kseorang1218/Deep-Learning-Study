@@ -38,23 +38,23 @@ def main(config, latent_size):
     loss = torch.nn.MSELoss()
 
     trainer = funs.Trainer(model, loss, optimizer, device)
-    trainer.train(config.epoch, train_loader)
-    trainer.save(config.model_root, model_name=model_name, latent_size=latent_size)
+    # trainer.train(config.epoch, train_loader)
+    # trainer.save(config.model_root, model_name=model_name, latent_size=latent_size)
 
     model_path = f'{config.model_root}/{model_name}_{latent_size}.pt'
     trainer.model.load_state_dict(torch.load(model_path, weights_only=True))
 
-    latent_vectors, fault_labels = trainer.eval(eval_loader) 
+    latent_vectors, fault_labels = trainer.eval(eval_loader, 'evaluation_results_wdcnn_ae', latent_size) 
     # 2d tnse
-    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
-                     config.seed, n_components=2, model_name=model_name, except_IR=False)
-    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
-                     config.seed, n_components=2, model_name=model_name, except_IR=True)
-    # 3d tnse
-    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
-                     config.seed, n_components=3, model_name=model_name, except_IR=False)
-    latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
-                     config.seed, n_components=3, model_name=model_name, except_IR=True)
+    # latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+    #                  config.seed, n_components=2, model_name=model_name, except_IR=False)
+    # latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+    #                  config.seed, n_components=2, model_name=model_name, except_IR=True)
+    # # 3d tnse
+    # latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+    #                  config.seed, n_components=3, model_name=model_name, except_IR=False)
+    # latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
+    #                  config.seed, n_components=3, model_name=model_name, except_IR=True)
 
    
 if __name__ == '__main__' :

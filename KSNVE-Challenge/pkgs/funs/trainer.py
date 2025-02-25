@@ -3,6 +3,7 @@
 import torch
 import numpy as np
 import os
+import csv
 
 from sklearn.metrics import roc_auc_score
 
@@ -36,13 +37,20 @@ class Trainer:
 
         return train_loss_list
             
-    def eval(self, eval_loader):
+    def eval(self, eval_loader, csv_name, latent_size):
         print("\nStarting Evaluation... \n" + "-" * 40)
         self.model.eval()
         eval_loss_list, auc_dic, latent_vectors, fault_label_list = self.validation_step(eval_loader)
         print(f'Validation Loss: {np.mean(eval_loss_list):.5f}')
         for fault, auc in auc_dic.items():
             print(f'{fault} AUC \t{auc:.5f}')
+
+        with open(f"{csv_name}.csv", mode='a', newline='') as file:
+            writer = csv.writer(file)
+            # 첫 번째 줄에는 헤더를 추가하려면 파일이 비었을 때만 추가
+            writer.writerow(["Fault", "AUC", "Validation Loss", "latent size"])  # CSV 헤더 작성
+            for fault, auc in auc_dic.items():
+                writer.writerow([fault, auc, np.mean(eval_loss_list), latent_size])  # Validation Loss를 각 AUC 항목과 함께 기록
             
         return latent_vectors, fault_label_list
 

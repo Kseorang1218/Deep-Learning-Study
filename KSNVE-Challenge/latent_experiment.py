@@ -34,13 +34,13 @@ def main(config, layer_size_list):
     loss = torch.nn.MSELoss()
 
     trainer = funs.Trainer(model, loss, optimizer, device)
-    trainer.train(config.epoch, train_loader)
-    trainer.save(config.model_root, latent_size=latent_size)
+    # trainer.train(config.epoch, train_loader)
+    # trainer.save(config.model_root, latent_size=latent_size)
 
     model_path = f'{config.model_root}/model_{latent_size}.pt'
     trainer.model.load_state_dict(torch.load(model_path, weights_only=True))
 
-    latent_vectors, fault_labels = trainer.eval(eval_loader) 
+    latent_vectors, fault_labels = trainer.eval(eval_loader, 'evaluation_results_ae', latent_size) 
     # 2d tnse
     latent.plot_tsne(config.tsne_root, latent_vectors, fault_labels, latent_size, 
                      config.seed, n_components=2, except_IR=False)
@@ -57,4 +57,4 @@ if __name__ == '__main__' :
     args = funs.parse_arguments()
     config = funs.load_yaml('./config.yaml')
 
-    main(config, args.latent)
+    main(config, args.latent_size_list)

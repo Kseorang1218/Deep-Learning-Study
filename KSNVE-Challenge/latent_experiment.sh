@@ -16,3 +16,4 @@ python latent_experiment_wdcnn_AE.py --latent_size 512
 python latent_experiment_wdcnn_AE.py --latent_size 256
 python latent_experiment_wdcnn_AE.py --latent_size 128
 python latent_experiment_wdcnn_AE.py --latent_size 100
+python latent_experiment_wdcnn_AE.py --latent_size 4

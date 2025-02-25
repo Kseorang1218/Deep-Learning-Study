@@ -17,17 +17,30 @@ class Conv1dBlock(nn.Module):
         return out
 
 
+# class Upsample1dBlock(nn.Module):
+#     def __init__(self, in_channels, out_channels, kernel_size, stride, padding):
+#         super(Upsample1dBlock, self).__init__()
+#         self.upsample = nn.Upsample(scale_factor=2, mode='linear')
+#         self.convtranspose1d = nn.ConvTranspose1d(in_channels, out_channels, kernel_size, stride, padding)
+#         self.batchnorm1d = nn.BatchNorm1d(out_channels)
+#         self.relu = nn.ReLU()
+
+#     def forward(self, x):
+#         out = self.upsample(x)
+#         out = self.convtranspose1d(out)
+#         out = self.batchnorm1d(out)
+#         out = self.relu(out)
+#         return out
+
 class Upsample1dBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, stride, padding):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, padding, output_padding=0):
         super(Upsample1dBlock, self).__init__()
-        self.upsample = nn.Upsample(scale_factor=2, mode='linear')
-        self.convtranspose1d = nn.ConvTranspose1d(in_channels, out_channels, kernel_size, stride, padding)
+        self.convtranspose1d = nn.ConvTranspose1d(in_channels, out_channels, kernel_size, stride, padding, output_padding)
         self.batchnorm1d = nn.BatchNorm1d(out_channels)
         self.relu = nn.ReLU()
 
     def forward(self, x):
-        out = self.upsample(x)
-        out = self.convtranspose1d(out)
+        out = self.convtranspose1d(x)
         out = self.batchnorm1d(out)
         out = self.relu(out)
         return out
@@ -69,11 +82,11 @@ class WDCNN_AE(nn.Module):
         )
 
         self.decoder_conv = nn.Sequential(
-            decoder_block(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=0),
-            decoder_block(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
-            decoder_block(in_channels=64, out_channels=32, kernel_size=1, stride=1, padding=0),
-            decoder_block(in_channels=32, out_channels=16, kernel_size=1, stride=1, padding=0),
-            nn.Upsample(scale_factor=2, mode='linear')
+            decoder_block(in_channels=64, out_channels=64, kernel_size=3, stride=2, padding=0, output_padding=1),
+            decoder_block(in_channels=64, out_channels=64, kernel_size=3, stride=2, padding=1, output_padding=1),
+            decoder_block(in_channels=64, out_channels=32, kernel_size=3, stride=2, padding=1, output_padding=1),
+            decoder_block(in_channels=32, out_channels=16, kernel_size=3, stride=2, padding=1, output_padding=1),
+            decoder_block(in_channels=16, out_channels=1, kernel_size=64, stride=32, padding=24, output_padding=16),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
