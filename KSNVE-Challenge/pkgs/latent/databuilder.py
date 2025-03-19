@@ -94,7 +94,7 @@ def data_sampling(data: np.ndarray, sample_size: int, overlap: int, window: int 
         
 def get_data_label_arrays(
         df: pd.DataFrame, sample_size: int, overlap: int
-        )-> Tuple[np.ndarray, np.ndarray]:
+        ) -> Tuple[np.ndarray, np.ndarray]:
     """
     데이터를 샘플링하며 (데이터, 라벨) 튜플로 반환하는 함수
 
@@ -118,17 +118,18 @@ def get_data_label_arrays(
     for _, row in df.iterrows():
         xdata = data_sampling(row['xdata'], sample_size, overlap)
         ydata = data_sampling(row['ydata'], sample_size, overlap)
+        zdata = np.array(xdata) - np.array(ydata)  
+
         label = row['label']
         
-        for x_seg, y_seg in zip(xdata, ydata):
-            data.append((x_seg, y_seg))
+        for z_seg in zdata:
+            data.append(z_seg.reshape(1, -1))  
             labels.append(label)
 
     return np.array(data), np.array(labels)
 
-
 if __name__=='__main__':
-    directory = '../dataset/train'
+    directory = '../../dataset/train'
     df = make_dataframe(directory)
     print('\n', df, '\n')
 

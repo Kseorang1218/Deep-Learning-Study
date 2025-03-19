@@ -8,7 +8,7 @@ import torch
 
 
 def main(config, latent_size):
-    model_name = 'wdcnn_ae_ma_2c'
+    model_name = 'wdcnn_ae'
     print(f'\nLatent space size: {latent_size}')
 
     funs.set_seed(config.seed)
