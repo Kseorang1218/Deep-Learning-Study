@@ -10,8 +10,9 @@ from datetime import datetime
 from sklearn.metrics import roc_auc_score
 
 def weights_init_normal(m):
-    if isinstance(m, (nn.Linear, nn.Conv1d, nn.ConvTranspose1d)):  # 가중치가 있는 레이어만 초기화
-        torch.nn.init.normal_(m.weight.data, 0.0, 0.02)
+    # if isinstance(m, (nn.Linear, nn.Conv1d, nn.ConvTranspose1d)):  # 가중치가 있는 레이어만 초기화
+    #     torch.nn.init.normal_(m.weight.data, 0.0, 0.02)
+    pass
 
 class TrainerDeepSVDD:
     def __init__(self, pre_model, model, loss, optimizer, device, train_loader, eval_loader, is_pretrain):
@@ -23,7 +24,7 @@ class TrainerDeepSVDD:
         self.is_pretrain = is_pretrain
 
 
-    def train(self, epoch, train_loader):
+    def train(self, epoch, train_loader, latent_dim):
         print("\nStarting Training... \n" + "-" * 40)
         self.model.train()
 
@@ -35,7 +36,7 @@ class TrainerDeepSVDD:
             c = torch.Tensor(state_dict['center']).to(self.device)
         else:
             self.model.apply(weights_init_normal)
-            c = torch.randn(self.args.latent_dim).to(self.device)
+            c = torch.randn(latent_dim).to(self.device)
 
         for epoch in range(0, epoch + 1):
             train_loss, train_accuracy = self.training_step(train_loader, c)

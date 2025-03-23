@@ -22,7 +22,6 @@ def parse_arguments():
         help="단일 latent space 크기 (예: --latent_size 512, 기본값: 512)"
     )
     
-    # 새로운 인자 추가
     parser.add_argument(
         "--z",
         action="store_true",
@@ -39,6 +38,14 @@ def parse_arguments():
         "--FFT",
         action="store_true",
         help="FFT 옵션 활성화 (예: --FFT, 기본값: 비활성화(False))"
+    )
+
+    parser.add_argument(
+        "--objective",
+        type=str,
+        choices=['one-class', 'soft-boundary'],
+        required=True,
+        help="Specify Deep SVDD objective (one-class or soft-boundary)"
     )
     
     args = parser.parse_args()

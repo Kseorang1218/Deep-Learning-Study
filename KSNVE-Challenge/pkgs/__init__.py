@@ -1,2 +1,1 @@
-from . import funs
-from . import latent
+from . import funs, latent, dsvdd

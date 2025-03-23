@@ -15,23 +15,7 @@ class Conv1dBlock(nn.Module):
         out = self.relu(out)
         out = self.maxpool1d(out)
         return out
-
-
-# class Upsample1dBlock(nn.Module):
-#     def __init__(self, in_channels, out_channels, kernel_size, stride, padding):
-#         super(Upsample1dBlock, self).__init__()
-#         self.upsample = nn.Upsample(scale_factor=2, mode='linear')
-#         self.convtranspose1d = nn.ConvTranspose1d(in_channels, out_channels, kernel_size, stride, padding)
-#         self.batchnorm1d = nn.BatchNorm1d(out_channels)
-#         self.relu = nn.ReLU()
-
-#     def forward(self, x):
-#         out = self.upsample(x)
-#         out = self.convtranspose1d(out)
-#         out = self.batchnorm1d(out)
-#         out = self.relu(out)
-#         return out
-
+    
 class Upsample1dBlock(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride, padding, output_padding=0):
         super(Upsample1dBlock, self).__init__()
@@ -56,7 +40,7 @@ class WDCNN_AE(nn.Module):
 
         # 인코더 부분
         self.encoder_conv = nn.Sequential(
-            encoder_block(in_channels=1, out_channels=16, kernel_size=first_kernel, stride=16, padding=24),
+            encoder_block(in_channels=2, out_channels=16, kernel_size=first_kernel, stride=16, padding=24),
             encoder_block(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1),
             encoder_block(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1),
             encoder_block(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=1),
@@ -64,7 +48,7 @@ class WDCNN_AE(nn.Module):
         )
 
         with torch.no_grad():
-            dummy = torch.rand(1, 1, input_size)
+            dummy = torch.rand(1, 2, input_size)
             dummy = self.encoder_conv(dummy)
             dummy = torch.flatten(dummy, 1)
             lin_input = dummy.shape[1]
@@ -86,11 +70,11 @@ class WDCNN_AE(nn.Module):
             decoder_block(in_channels=64, out_channels=64, kernel_size=3, stride=2, padding=1, output_padding=1),
             decoder_block(in_channels=64, out_channels=32, kernel_size=3, stride=2, padding=1, output_padding=1),
             decoder_block(in_channels=32, out_channels=16, kernel_size=3, stride=2, padding=1, output_padding=1),
-            decoder_block(in_channels=16, out_channels=1, kernel_size=64, stride=32, padding=24, output_padding=16),
+            decoder_block(in_channels=16, out_channels=2, kernel_size=64, stride=32, padding=24, output_padding=16),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        out = x.reshape(x.size(0), 1, -1)   # [batch_size, in_channels, input_size] -> [batch_size, 1, input_size*in_channels]
+        out = x.reshape(x.size(0), 2, -1)   # [batch_size, in_channels, input_size] -> [batch_size, 1, input_size*in_channels]
 
         out = self.encoder_conv(out)
 
@@ -119,7 +103,7 @@ if __name__=='__main__':
     model = WDCNN_AE(Conv1dBlock, Upsample1dBlock, latent_space_size).to(device)
     # print('\nmodel:', model)
 
-    x_input = x.reshape(x.size(0), 1, -1)
+    x_input = x.reshape(x.size(0), 2, -1)
     print('Model input shape:', x_input.shape)
 
     encoded = model.encoder_conv(x_input)
@@ -128,6 +112,7 @@ if __name__=='__main__':
     print('Encoded output size:', encoded.size())
 
     decoded = model.decoder_linear(encoded)
+    print('decoded output size:', decoded.size())
     decoded = decoded.view(batch_size, 64, -1)
     decoded = model.decoder_conv(decoded)
     decoded =  decoded.reshape(decoded.size(0), 2, -1)

@@ -1,6 +1,9 @@
 import torch.nn as nn
 import torch
 
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 class DeepSVDD_net(nn.Module):
     def __init__(self, in_channels=1, out_channels=16, kernel_size=3, stride=1, padding=1):
         super(DeepSVDD_net, self).__init__()
@@ -94,16 +97,15 @@ class Decoder(nn.Module):
     
     
 class AE1DCNN(nn.Module):
-    def __init__(self, encoder, decoder, input_size, latent_space_size, channel):
+    def __init__(self, encoder, decoder, input_size, latent_space_size, in_channels):
         super(AE1DCNN, self).__init__()
 
         self.encoder = encoder
         self.decoder = decoder
-        self.channel = channel
+        self.in_channels = in_channels
 
         with torch.no_grad():
-            dummy = torch.rand(1, channel, input_size)
-            dummy = dummy.reshape(dummy.size(0), channel, -1)
+            dummy = torch.rand(1, 1, input_size*in_channels).to(device)
             dummy = self.encoder(dummy)
             dummy = torch.flatten(dummy, 1)
             lin_input = dummy.shape[1]
@@ -122,7 +124,7 @@ class AE1DCNN(nn.Module):
         )
 
     def forward(self, x):
-        out = x.reshape(x.size(0), self.channel, -1)
+        out = x.reshape(x.size(0), self.in_channels, -1)
         out = self.encoder(out)
 
         out = torch.flatten(out, 1)
@@ -135,7 +137,7 @@ class AE1DCNN(nn.Module):
         out = out.view(out.shape[0], 64, -1)
         out = self.decoder(out)
 
-        out = out.reshape(out.size(0), self.channel, -1) 
+        out = out.reshape(out.size(0), self.in_channels, -1) 
 
         return out, latent_vector
 
@@ -151,7 +153,7 @@ if __name__=='__main__':
     latent_space_size = 512
     encoder = Encoder(in_channels=channel)
     decoder = Decoder(last_channel=channel)
-    model = AE1DCNN(encoder, decoder, input_size=input_size, latent_space_size=latent_space_size, channel=channel).to(device)
+    model = AE1DCNN(encoder, decoder, input_size=input_size, latent_space_size=latent_space_size, in_channels=channel).to(device)
     # print('\nmodel:', model)
 
     x_input = x.reshape(x.size(0), channel, -1)
