@@ -35,7 +35,7 @@ def parse_arguments():
     )
     
     parser.add_argument(
-        "--FFT",
+        "--fft",
         action="store_true",
         help="FFT 옵션 활성화 (예: --FFT, 기본값: 비활성화(False))"
     )

@@ -18,9 +18,12 @@ class Trainer:
     def train(self, epoch, train_loader):
         print("\nStarting Training... \n" + "-" * 40)
         self.model.train()
+        train_loss = []
         for epoch in range(0, epoch + 1):
             train_loss_list = self.training_step(train_loader)
             print(f'[EPOCH: {epoch}] \nTrain Loss: {np.mean(train_loss_list):.5f}\n')
+            train_loss.append(np.mean(train_loss_list))
+        return train_loss
 
     def training_step(self, train_loader):
         train_loss_list = []
@@ -41,7 +44,7 @@ class Trainer:
     def eval(self, eval_loader, latent_size, epoch, save_result=True, csv_name=None, csv_root=None):
         print("\nStarting Evaluation... \n" + "-" * 40)
         self.model.eval()
-        eval_loss_list, auc_dic, latent_vectors, fault_label_list = self.validation_step(eval_loader)
+        eval_loss_list, auc_dic, latent_vectors, fault_label_list, y_pred = self.validation_step(eval_loader)
         print(f'Validation Loss: {np.mean(eval_loss_list):.5f}')
         for fault, auc in auc_dic.items():
             print(f'{fault} AUC \t{auc:.5f}')
@@ -51,7 +54,7 @@ class Trainer:
                 raise ValueError("Both 'csv_name' and 'csv_root' must be provided when saving the results.")
             self.save_result(csv_name, csv_root, auc_dic, latent_size, epoch, np.mean(eval_loss_list))
             
-        return latent_vectors, fault_label_list
+        return latent_vectors, fault_label_list, y_pred
 
 
     def validation_step(self, eval_loader):
@@ -83,7 +86,7 @@ class Trainer:
 
         latent_vectors = np.concatenate(latent_vectors, axis=0)
 
-        return eval_loss_list, auc_dic, latent_vectors, fault_label_list
+        return eval_loss_list, auc_dic, latent_vectors, fault_label_list, y_pred
 
     def compute_auc(self, y_true, y_pred, fault_label_list = None, per_fault: bool = True):
         auc_dic = {}

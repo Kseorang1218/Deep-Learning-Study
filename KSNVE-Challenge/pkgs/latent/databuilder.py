@@ -93,7 +93,8 @@ def data_sampling(data: np.ndarray, sample_size: int, overlap: int, window: int 
     return data_list
         
 def get_data_label_arrays(
-        df: pd.DataFrame, sample_size: int, overlap: int
+        df: pd.DataFrame, sample_size: int, overlap: int,
+        z: bool = True, fft: bool = True
         ) -> Tuple[np.ndarray, np.ndarray]:
     """
     데이터를 샘플링하며 (데이터, 라벨) 튜플로 반환하는 함수
@@ -116,17 +117,43 @@ def get_data_label_arrays(
     labels = []
 
     for _, row in df.iterrows():
-        xdata = data_sampling(row['xdata'], sample_size, overlap)
-        ydata = data_sampling(row['ydata'], sample_size, overlap)
-        zdata = np.array(xdata) - np.array(ydata)  
-
         label = row['label']
-        
-        for z_seg in zdata:
-            data.append(z_seg.reshape(1, -1))  
-            labels.append(label)
 
-    return np.array(data), np.array(labels)
+        if z: 
+            in_channels = 1
+            zdata = data_sampling(row['zdata'], sample_size, overlap)
+            if fft:
+                zfft = data_sampling(row['z_fft'], sample_size, overlap)
+
+        else:
+            in_channels = 2
+            xdata = data_sampling(row['xdata'], sample_size, overlap)
+            ydata = data_sampling(row['ydata'], sample_size, overlap)
+            if fft:
+                xfft = data_sampling(row['x_fft'], sample_size, overlap)
+                yfft = data_sampling(row['y_fft'], sample_size, overlap)
+
+        if z and not fft:
+            for z_seg in zdata:
+                data.append(z_seg.reshape(1, -1))  
+                labels.append(label)
+        if z and fft:
+            for z_seg in zfft:
+                data.append(z_seg.reshape(1, -1))  
+                labels.append(label)
+
+        if not z and not fft:
+            for x_seg, y_seg in zip(xdata, ydata):
+                data.append((x_seg, y_seg))
+                labels.append(label)
+
+        if not z and fft:
+            for x_seg, y_seg in zip(xfft, yfft):
+                data.append((x_seg, y_seg))
+                labels.append(label)
+
+
+    return np.array(data), np.array(labels), in_channels
 
 if __name__=='__main__':
     directory = '../../dataset/train'

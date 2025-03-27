@@ -2,25 +2,26 @@ import torch.nn as nn
 import torch
 
 class Encoder(nn.Module):
+    # wdcnn-ae 하려면 여기서 batchnorm11d, relu로 바꿔야함 
     def __init__(self, in_channels=1, out_channels=16, kernel_size=64, stride=16, padding=24):
         super(Encoder, self).__init__()
 
-        self.conv1 = nn.Conv1d(in_channels, out_channels, kernel_size, stride, padding)
-        self.batchnorm1 = nn.BatchNorm1d(16)
+        self.conv1 = nn.Conv1d(in_channels, out_channels, kernel_size, stride, padding, bias=False)
+        self.batchnorm1 = nn.InstanceNorm1d(16, affine=False)
 
-        self.conv2 = nn.Conv1d(16, 32, 3, 1, 1)
-        self.batchnorm2 = nn.BatchNorm1d(32)
+        self.conv2 = nn.Conv1d(16, 32, 3, 1, 1, bias=False)
+        self.batchnorm2 = nn.InstanceNorm1d(32, affine=False)
 
-        self.conv3 = nn.Conv1d(32, 64, 3, 1, 1)
-        self.batchnorm3 = nn.BatchNorm1d(64)
+        self.conv3 = nn.Conv1d(32, 64, 3, 1, 1, bias=False)
+        self.batchnorm3 = nn.InstanceNorm1d(64, affine=False)
 
-        self.conv4 = nn.Conv1d(64, 64, 3, 1, 1)
-        self.batchnorm4 = nn.BatchNorm1d(64)
+        self.conv4 = nn.Conv1d(64, 64, 3, 1, 1, bias=False)
+        self.batchnorm4 = nn.InstanceNorm1d(64, affine=False)
 
-        self.conv5 = nn.Conv1d(64, 64, 3, 1, 0)
-        self.batchnorm5 = nn.BatchNorm1d(64)
+        self.conv5 = nn.Conv1d(64, 64, 3, 1, 0, bias=False)
+        self.batchnorm5 = nn.InstanceNorm1d(64, affine=False)
 
-        self.relu = nn.ReLU()
+        self.relu = nn.GELU()
         self.maxpool1d = nn.MaxPool1d(2,2)
 
     def forward(self, x):
@@ -43,8 +44,8 @@ class Net(nn.Module):
         self.rep_dim = latent_space_size
 
         self.encoder_linear = nn.Sequential(
-            nn.Linear(self.get_linear_input_size(), latent_space_size),
-            nn.BatchNorm1d(latent_space_size),
+            nn.Linear(self.get_linear_input_size(), latent_space_size, bias=False),
+            nn.BatchNorm1d(latent_space_size, affine=False),
             nn.ReLU(),
         )
 

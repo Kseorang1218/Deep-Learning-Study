@@ -16,7 +16,7 @@ def main(config, args, pretrain=True, load_model=False):
     mode = args.objective
     latent_size = args.latent_size
 
-    model_name = f'Vanilla_dsvdd_{mode}_{latent_size}'
+    model_name = f'IG_dsvdd_{mode}_{latent_size}'
 
     print(f'\nLatent space size: {latent_size}')
     
@@ -59,8 +59,8 @@ def main(config, args, pretrain=True, load_model=False):
     eval_loader = funs.get_dataloader(eval_dataset, 1, shuffle = False)
 
 
-    # net = dsvdd.Net(config.sample_size, latent_space_size=latent_size, in_channels=in_channels).to(device)
-    net = dsvdd.Vanilla(config.sample_size, latent_space_size=latent_size, in_channels=in_channels).to(device)
+    net = dsvdd.Net(config.sample_size, latent_space_size=latent_size, in_channels=in_channels).to(device)
+    # net = dsvdd.Vanilla(config.sample_size, latent_space_size=latent_size, in_channels=in_channels).to(device)
     trainer = dsvdd.DeepSVDDTrainer(objective=mode, R=0, c=None, nu=0.1, config=config, device=device)
     # ae_net = dsvdd.AE_Net(input_size=config.sample_size, latent_space_size=latent_size, in_channels=in_channels)
     # ae_trainer = dsvdd.AETrainer(config, device)

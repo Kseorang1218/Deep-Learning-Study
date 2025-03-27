@@ -28,11 +28,14 @@ class DeepSVDDTrainer:
         if self.c is None:
             self.c = self.init_center_c(train_loader, net)
 
+        train_loss_list = []
+
         net.train()
         for epoch in range(0, self.config.epoch + 1):
             train_loss = self.training_step(net, train_loader, optimizer, epoch)
             print(f'[EPOCH: {epoch}] \nTrain Loss: {train_loss:.5f}\n')
-        return net
+            train_loss_list.append(train_loss)
+        return net, train_loss_list
 
     def training_step(self, net, train_loader, optimizer, epoch):
         loss_epoch = 0.0
@@ -42,7 +45,7 @@ class DeepSVDDTrainer:
 
             optimizer.zero_grad()
             outputs = net(inputs)
-            dist = torch.sum((outputs - self.c.unsqueeze(0)) ** 2, dim=1)
+            dist = torch.sum((outputs - self.c) ** 2, dim=1)
             if self.objective == 'soft-boundary':
                 scores = dist - self.R ** 2
                 loss = self.R ** 2 + (1 / self.nu) * torch.mean(torch.max(torch.zeros_like(scores), scores))
@@ -64,45 +67,64 @@ class DeepSVDDTrainer:
         print("\nStarting Evaluation... \n" + "-" * 40)
         net = net.to(self.device)
         net.eval()
-        auc_dic, latent_vectors, fault_label_list = self.validation_step(net, eval_loader)
+        auc_dic, latent_vectors, fault_label_list, test_auc, y_pred = self.validation_step(net, eval_loader)
         for fault, auc in auc_dic.items():
             print(f'{fault} AUC \t{auc:.5f}')
+        print('dsvdd test auc', test_auc)
 
         if save_result:
             if csv_name is None or csv_root is None:
                 raise ValueError("Both 'csv_name' and 'csv_root' must be provided when saving the results.")
             self.save_result(csv_name, csv_root, auc_dic, latent_size, self.config.epoch, -1)
         
-        return latent_vectors, fault_label_list
+        return latent_vectors, fault_label_list, y_pred
 
     def validation_step(self, net, eval_loader):
         y_true = []
         y_pred = []
         latent_vectors = []
 
+        idx_label_score = []
+
         fault_label_list = []
         with torch.no_grad():
             for batch_idx, (data, label) in enumerate(eval_loader):
                 inputs = data.to(self.device)
-                label = label.to(self.device)
+                labels = label.to(self.device)
 
                 outputs = net(inputs)
-                dist = torch.sum((outputs - self.c.unsqueeze(0)) ** 2, dim=1)
+                dist = torch.sum((outputs - self.c) ** 2, dim=1)
                 if self.objective == 'soft-boundary':
                     scores = dist - self.R ** 2
                 else:
                     scores = dist
+
+                for i in range(len(labels)):
+                    binary_label = 1 if labels[i].item() > 0 else 0
+                    idx_label_score.append((batch_idx, binary_label, scores[i].item()))
+                    y_true.append(binary_label)
+                    y_pred.append(scores[i].item())
+                    fault_label_list.append(labels[i].item())
+
+                # idx_label_score += list(zip([batch_idx],
+                #             [1 if label.item() > 0 else 0],
+                #             scores.cpu().data.numpy().tolist()))
                 
-                y_true.append(1 if label.item() > 0 else 0)
-                y_pred.append(scores.item())
-                fault_label_list.append(label.item())
+                # y_true.append(1 if label.item() > 0 else 0)
+                # y_pred.append(scores.item())
+                # fault_label_list.append(label.item())
 
                 latent_vectors.append(outputs.cpu().numpy())
+            
+        _, labels, scores = zip(*idx_label_score)
+        labels = np.array(labels)
+        scores = np.array(scores)
+        test_auc = roc_auc_score(labels, scores)
 
-            auc_dic = self.compute_auc(y_true, y_pred, fault_label_list, per_fault=True)
+        auc_dic = self.compute_auc(y_true, y_pred, fault_label_list, per_fault=True)
 
         latent_vectors = np.concatenate(latent_vectors, axis=0)
-        return auc_dic, latent_vectors, fault_label_list
+        return auc_dic, latent_vectors, fault_label_list, test_auc, y_pred
 
     def compute_auc(self, y_true, y_pred, fault_label_list = None, per_fault: bool = True):
         auc_dic = {}

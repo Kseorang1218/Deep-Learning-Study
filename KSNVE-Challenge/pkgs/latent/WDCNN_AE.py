@@ -40,18 +40,14 @@ class WDCNN_AE(nn.Module):
 
         # 인코더 부분
         self.encoder_conv = nn.Sequential(
-            encoder_block(in_channels=2, out_channels=16, kernel_size=first_kernel, stride=16, padding=24),
+            encoder_block(in_channels=in_channels, out_channels=16, kernel_size=first_kernel, stride=16, padding=24),
             encoder_block(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1),
             encoder_block(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1),
             encoder_block(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=1),
             encoder_block(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=0),
         )
 
-        with torch.no_grad():
-            dummy = torch.rand(1, 2, input_size)
-            dummy = self.encoder_conv(dummy)
-            dummy = torch.flatten(dummy, 1)
-            lin_input = dummy.shape[1]
+        lin_input = self.get_linear_input_size()
 
         self.encoder_linear = nn.Sequential(
             nn.Linear(lin_input, latent_space_size),
@@ -70,11 +66,19 @@ class WDCNN_AE(nn.Module):
             decoder_block(in_channels=64, out_channels=64, kernel_size=3, stride=2, padding=1, output_padding=1),
             decoder_block(in_channels=64, out_channels=32, kernel_size=3, stride=2, padding=1, output_padding=1),
             decoder_block(in_channels=32, out_channels=16, kernel_size=3, stride=2, padding=1, output_padding=1),
-            decoder_block(in_channels=16, out_channels=2, kernel_size=64, stride=32, padding=24, output_padding=16),
+            decoder_block(in_channels=16, out_channels=in_channels, kernel_size=64, stride=32, padding=24, output_padding=16),
         )
 
+    def get_linear_input_size(self):
+        with torch.no_grad():
+            # dummy 텐서를 생성하여 인코더 출력 크기 계산
+            dummy = torch.rand(1, self.in_channels, self.input_size)
+            dummy = self.encoder_conv(dummy)
+            dummy = torch.flatten(dummy, 1)
+            return dummy.shape[1]
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        out = x.reshape(x.size(0), 2, -1)   # [batch_size, in_channels, input_size] -> [batch_size, 1, input_size*in_channels]
+        out = x.reshape(x.size(0), self.in_channels, -1)   # [batch_size, in_channels, input_size] -> [batch_size, 1, input_size*in_channels]
 
         out = self.encoder_conv(out)
 
@@ -96,14 +100,17 @@ class WDCNN_AE(nn.Module):
 if __name__=='__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     batch_size = 128
-    x = torch.randn(batch_size, 2, 4096).to(device)
+    in_channels = 1
+    sample_size = 4096
+    x = torch.randn(batch_size, in_channels, sample_size).to(device)
     print('\nData input shape:',x.shape)
 
     latent_space_size = 2048
-    model = WDCNN_AE(Conv1dBlock, Upsample1dBlock, latent_space_size).to(device)
+    model = WDCNN_AE(Conv1dBlock, Upsample1dBlock, latent_space_size, 
+                     in_channels=in_channels, input_size=sample_size).to(device)
     # print('\nmodel:', model)
 
-    x_input = x.reshape(x.size(0), 2, -1)
+    x_input = x.reshape(x.size(0), in_channels, -1)
     print('Model input shape:', x_input.shape)
 
     encoded = model.encoder_conv(x_input)
@@ -115,5 +122,5 @@ if __name__=='__main__':
     print('decoded output size:', decoded.size())
     decoded = decoded.view(batch_size, 64, -1)
     decoded = model.decoder_conv(decoded)
-    decoded =  decoded.reshape(decoded.size(0), 2, -1)
+    decoded =  decoded.reshape(decoded.size(0), in_channels, -1)
     print('Data output shape:', decoded.shape,'\n')

@@ -39,18 +39,20 @@ class DeepSVDD:
 
     def train(self, trainer, train_loader):
         self.trainer = trainer
-        self.net = self.trainer.train(self.net, train_loader)
+        self.net, train_loss_list = self.trainer.train(self.net, train_loader)
         self.R = float(self.trainer.R.cpu().data.numpy())  # get float
         self.c = self.trainer.c.cpu().data.numpy().tolist()  # get list
+
+        return train_loss_list
 
     def eval(self, trainer, eval_loader, latent_size, 
              csv_name, csv_root, save_result=True):
         if self.trainer is None:
             self.trainer = trainer
-        latent_vectors, fault_label_list = self.trainer.eval(self.net, eval_loader, latent_size,
+        latent_vectors, fault_label_list, y_pred = self.trainer.eval(self.net, eval_loader, latent_size,
                                                              save_result, csv_name, csv_root)
 
-        return latent_vectors, fault_label_list
+        return latent_vectors, fault_label_list, y_pred
 
     def load_model(self, ae_net, model_path, load_ae=False):
         """Load Deep SVDD model from model_path."""
